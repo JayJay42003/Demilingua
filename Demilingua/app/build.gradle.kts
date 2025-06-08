@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.demilingua"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -35,6 +35,7 @@ android {
 }
 
 dependencies {
+    implementation ("com.fasterxml.jackson.core:jackson-databind:2.13.0")
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0") // Para JSON
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.1") // Para logs

@@ -1,8 +1,7 @@
-package com.example.demilingua;
+package com.example.demilingua.controller;
 
 public class LoginResponse {
     private String status;
-    private String token;
     private String message;
     private int userId;
     private String nombre;
@@ -21,14 +20,6 @@ public class LoginResponse {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
     public String getMessage() {

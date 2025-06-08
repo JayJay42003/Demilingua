@@ -1,4 +1,4 @@
-package com.example.demilingua;
+package com.example.demilingua.controller;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;

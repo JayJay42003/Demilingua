@@ -17,12 +17,10 @@ import java.util.List;
 public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.ViewHolder> {
 
     private List<Idioma> languages;
-    private OnLanguageClickListener listener;
 
     public interface OnLanguageClickListener {
         void onLanguageClick(Idioma idioma);
     }
-
 
     public LanguageAdapter(List<Idioma> languages) {
         this.languages = languages;

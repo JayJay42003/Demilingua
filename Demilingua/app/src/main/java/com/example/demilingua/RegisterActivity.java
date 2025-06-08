@@ -1,6 +1,5 @@
 package com.example.demilingua;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -8,6 +7,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.demilingua.controller.ApiService;
+import com.example.demilingua.controller.LoginResponse;
+import com.example.demilingua.controller.RetrofitClient;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.IOException;
@@ -155,7 +158,6 @@ public class RegisterActivity extends AppCompatActivity {
             .putString("correo", correo)
             .apply();
 
-
         finish(); // Regresar a Login
     }
 
@@ -164,7 +166,6 @@ public class RegisterActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = prefs.edit();
 
         editor.putBoolean("isLoggedIn", true);
-        editor.putString("token", response.getToken());
         editor.putInt("userId", response.getUserId());
         editor.putString("userEmail", etCorreo.getText().toString().trim()); // del EditText
         editor.putString("userName", response.getNombre());

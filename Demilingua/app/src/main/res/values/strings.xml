@@ -55,4 +55,7 @@
     <string name="email">Email</string>
     <string name="logout">Cerrar Sesión</string>
     <string name="select_language">Elige Idioma</string>
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+    <string name="save">Guardar</string>
 </resources>
