@@ -3,6 +3,7 @@ package com.example.demilingua;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Patterns;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -21,7 +22,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
-
     private EditText etNombre, etCorreo, etContrasena, etConfirmarContrasena;
     private TextInputLayout tilNombre, tilCorreo, tilContrasena, tilConfirmarContrasena;
     private Button btnRegistrar;
@@ -29,7 +29,7 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.registro);
+        setContentView(R.layout.activity_register);
 
         // Inicializar vistas
         tilNombre = findViewById(R.id.tilNombre);
@@ -173,8 +173,9 @@ public class RegisterActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId()==android.R.id.home){ finish(); return true; }
+        return super.onOptionsItemSelected(item);
     }
+
 }

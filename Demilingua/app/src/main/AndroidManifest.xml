@@ -13,7 +13,7 @@
             android:exported="false"
             android:theme="@style/Theme.Demilingua" />
         <activity
-            android:name=".CursoActivity"
+            android:name=".CourseActivity"
             android:exported="false"
             android:theme="@style/Theme.Demilingua" />
         <activity

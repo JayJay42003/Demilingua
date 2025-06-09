@@ -4,6 +4,7 @@ package com.example.demilingua;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,7 +32,7 @@ import retrofit2.Response;
  * Muestra la lista de cursos de un idioma (id y nombre
  * recibidos por Intent extras:  "id"  y  "nombre").
  */
-public class CursoActivity extends AppCompatActivity implements CourseAdapter.OnCourseClickListener{
+public class CourseActivity extends AppCompatActivity implements CourseAdapter.OnCourseClickListener{
 
     private RecyclerView rvCursos;
     private TextView tvEmpty;
@@ -42,7 +43,7 @@ public class CursoActivity extends AppCompatActivity implements CourseAdapter.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_curso);
+        setContentView(R.layout.activity_course);
 
         // ───────────────────────── Toolbar ─────────────────────────
         String idiomaNombre = getIntent().getStringExtra("nombre");
@@ -68,9 +69,6 @@ public class CursoActivity extends AppCompatActivity implements CourseAdapter.On
         cargarCursosPorIdioma(idiomaId);
     }
 
-    /**
-     * Llama a la API, recibe la lista y actualiza el RecyclerView.
-     */
     private void cargarCursosPorIdioma(int idiomaId) {
         Call<List<Map<String,String>>> call = apiService.course(idiomaId);
 
@@ -96,7 +94,7 @@ public class CursoActivity extends AppCompatActivity implements CourseAdapter.On
 
                     tvEmpty.setVisibility(cursoList.isEmpty() ? View.VISIBLE : View.GONE);
 
-                } else {  // HTTP 4xx / 5xx
+                } else {
                     String err = "Código: " + response.code();
                     try {
                         if (response.errorBody() != null) {
@@ -105,7 +103,7 @@ public class CursoActivity extends AppCompatActivity implements CourseAdapter.On
                     } catch (IOException ignored) {
                     }
 
-                    Toast.makeText(CursoActivity.this,
+                    Toast.makeText(CourseActivity.this,
                             "Error al obtener cursos: " + err,
                             Toast.LENGTH_LONG).show();
                     tvEmpty.setVisibility(View.VISIBLE);
@@ -116,7 +114,7 @@ public class CursoActivity extends AppCompatActivity implements CourseAdapter.On
             public void onFailure(@NonNull Call<List<Map<String,String>>> call,
                                   @NonNull Throwable t) {
                 Log.e("CursoActivity", "Fallo Retrofit", t);
-                Toast.makeText(CursoActivity.this,
+                Toast.makeText(CourseActivity.this,
                         "Sin conexión: " + t.getMessage(),
                         Toast.LENGTH_LONG).show();
                 tvEmpty.setVisibility(View.VISIBLE);
@@ -124,11 +122,18 @@ public class CursoActivity extends AppCompatActivity implements CourseAdapter.On
         });
     }
 
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId()==android.R.id.home){ finish(); return true; }
+        return super.onOptionsItemSelected(item);
+    }
+
+
     @Override
     public void onCourseClick(Curso curso) {
         Intent i = new Intent(this, TestActivity.class);
         i.putExtra("cursoId", curso.getId());
         i.putExtra("cursoName", curso.getNombre());
+        i.putExtra("idiomaId",curso.getIdiomaId());
         startActivity(i);
     }
 }

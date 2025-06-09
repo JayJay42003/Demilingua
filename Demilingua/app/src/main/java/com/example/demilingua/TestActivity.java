@@ -15,6 +15,7 @@ import com.example.demilingua.controller.RetrofitClient;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ import retrofit2.Response;
 public class TestActivity extends AppCompatActivity {
 
     private TextView tvContenido, tvOpciones;
-    private Button   btnNext;
+    private Button btnNext;
     private TextInputEditText etRespuesta;
     private ApiService api;
     private int cursoId;
@@ -34,13 +35,18 @@ public class TestActivity extends AppCompatActivity {
     private List<Map<String,Object>> ejercicios = new ArrayList<>();
     private int indice = 0;
     private int puntuacion = 0;
+    int usuarioId;
+    int idiomaId;
 
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         setContentView(R.layout.activity_test);
 
-        cursoId    = getIntent().getIntExtra("cursoId", 0);
+        cursoId  = getIntent().getIntExtra("cursoId", 0);
+        usuarioId = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+                .getInt("userId", 0);
+        idiomaId  = getIntent().getIntExtra("idiomaId", 0);
 
         Toolbar tb = findViewById(R.id.toolbarTest);
         setSupportActionBar(tb);
@@ -48,7 +54,7 @@ public class TestActivity extends AppCompatActivity {
 
         tvContenido = findViewById(R.id.tvContenido);
         tvOpciones  = findViewById(R.id.tvOpciones);
-        btnNext     = findViewById(R.id.btnNext);
+        btnNext = findViewById(R.id.btnNext);
         etRespuesta = findViewById(R.id.etRespuesta);
 
         api = RetrofitClient.getApiService();
@@ -57,12 +63,11 @@ public class TestActivity extends AppCompatActivity {
         cargarTestAleatorio();
     }
 
-    /* 1º: pedir un test y luego sus ejercicios */
     private void cargarTestAleatorio() {
         api.randomTest(cursoId).enqueue(new Callback<>() {
             @Override public void onResponse(Call<Map<String,Object>> c, Response<Map<String,Object>> r) {
                 if (r.isSuccessful() && r.body()!=null) {
-                    int testId = ((Double) r.body().get("id")).intValue(); // Gson devuelve double
+                    int testId = pasarInt(r.body().get("id")); // Gson devuelve double
                     String titulo = (String) r.body().get("titulo");
                     getSupportActionBar().setTitle(titulo);
                     cargarEjercicios(testId);
@@ -87,12 +92,36 @@ public class TestActivity extends AppCompatActivity {
         });
     }
 
-    /* 2º: mostrar ejercicio actual */
+
     private void mostrarEjercicioActual() {
         if (indice >= ejercicios.size()) {
             tvContenido.setText(getString(R.string.test_finished) + ": " + puntuacion + " puntos");
             tvOpciones.setText("");
             btnNext.setEnabled(false);
+            etRespuesta.setEnabled(false);
+
+            Map<String,Integer> body = new HashMap<>();
+            body.put("usuarioId", usuarioId);
+            body.put("idiomaId" , idiomaId);
+            body.put("puntos"   , puntuacion);
+
+            api.enviarPuntos(body).enqueue(new Callback<>() {
+                @Override public void onResponse(Call<Map<String,String>> c,
+                                                 Response<Map<String,String>> r) {
+                    if (r.isSuccessful()) {
+                        Toast.makeText(TestActivity.this,
+                                "Puntuación guardada", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(TestActivity.this,
+                                "No se pudo guardar la puntuación", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override public void onFailure(Call<Map<String,String>> c, Throwable t) {
+                    Toast.makeText(TestActivity.this,
+                            "Error al enviar puntos", Toast.LENGTH_SHORT).show();
+                }
+            });
+
             return;
         }
 
@@ -107,17 +136,16 @@ public class TestActivity extends AppCompatActivity {
     /* 3º: avanzar y sumar puntuación (modo demo) */
     private void mostrarSiguiente() {
 
-        // 1. Obtener puntos y respuesta correcta del ejercicio actual
         Map<String, Object> ej  = ejercicios.get(indice);
-        int puntos = ((Double) ej.get("puntos")).intValue();          // puntos del ejercicio
+        int puntos =pasarInt(ej.get("puntos"));          // puntos del ejercicio
         String correcta = ((String) ej.get("respuesta")).trim();     // respuesta_correcta
 
-        // 2. Respuesta del usuario (lo escrito en el EditText)
+
         String usuario = etRespuesta.getText() != null
                 ? etRespuesta.getText().toString().trim()
                 : "";
 
-        // 3. Comparar (ignorando mayúsc/minúsc y espacios finales)
+
         if (!usuario.isEmpty() && usuario.equalsIgnoreCase(correcta)) {
             puntuacion += puntos;
             Toast.makeText(this,
@@ -129,10 +157,9 @@ public class TestActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT).show();
         }
 
-        // 4. Limpiar campo para la siguiente pregunta
+
         etRespuesta.setText("");
 
-        // 5. Avanzar y mostrar
         indice++;
         mostrarEjercicioActual();
     }
@@ -141,6 +168,12 @@ public class TestActivity extends AppCompatActivity {
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId()==android.R.id.home){ finish(); return true; }
         return super.onOptionsItemSelected(item);
+    }
+
+    private int pasarInt(Object o) {
+        if (o instanceof Number)   return ((Number) o).intValue();
+        if (o instanceof String) return Integer.parseInt(o.toString());
+        return 0;
     }
 }
 

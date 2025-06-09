@@ -26,4 +26,11 @@ public interface ApiService {
     @GET("api/exercises")
     Call<List<Map<String,Object>>> exercises(@Query("testId") int testId);
 
+    @GET("api/ranking")
+    Call<List<Map<String,String>>> getRanking();
+
+    @POST("api/puntos")
+    Call<Map<String,String>> enviarPuntos(@Body Map<String,Integer> body);
+
+
 }

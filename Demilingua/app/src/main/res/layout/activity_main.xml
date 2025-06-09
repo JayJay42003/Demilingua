@@ -3,9 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="16dp"
     android:background="@color/white">
+
 
     <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
@@ -30,7 +31,8 @@
             android:src="@drawable/profile"
             android:scaleType="fitCenter"
             android:background="@color/white"
-            android:layout_gravity="end"/>
+            android:layout_gravity="end"
+            android:padding="4dp"/>
     </androidx.appcompat.widget.Toolbar>
 
     <!-- Lista de Idiomas -->
@@ -40,5 +42,23 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"/>
 
+    <!-- Ranking header -->
+    <TextView
+        android:id="@+id/tvRankingHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ranking"
+        android:layout_gravity="center"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"/>
+
+    <!-- RecyclerView Ranking -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvRanking"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp"/>
 
 </LinearLayout>

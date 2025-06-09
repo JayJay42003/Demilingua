@@ -103,15 +103,6 @@
             android:layout_marginTop="8dp"
             app:cornerRadius="24dp"/>
 
-        <!-- Enlace a Login -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="¿Ya tienes cuenta? Inicia sesión"
-            android:textColor="@color/purple_500"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="16dp"
-            android:clickable="true"
-            android:focusable="true"/>
+
     </LinearLayout>
 </ScrollView>

@@ -90,7 +90,7 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         }
 
-        // Construir body
+
         Map<String, String> body = new HashMap<>();
         body.put("id"     , String.valueOf(prefs.getInt("userId", 0)));
         body.put("nombre" , nombre);
@@ -107,7 +107,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 if (res.isSuccessful() && res.body() != null
                         && "ok".equals(res.body().get("status"))) {
 
-                    // Guardar localmente sólo si el backend dijo “ok”
+
                     prefs.edit()
                             .putString("userName" , nombre)
                             .putString("userEmail", correo)

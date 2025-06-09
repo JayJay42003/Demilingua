@@ -1,11 +1,9 @@
 package com.example.demilingua;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,7 +11,6 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 /**
  * Activity de perfil sencillo que muestra avatar, nombre y correo,
@@ -30,7 +27,7 @@ public class PerfilActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_perfil);     // usa el ScrollView modelo
+        setContentView(R.layout.activity_profile);     // usa el ScrollView modelo
 
         // ───── Vistas ─────
         ivProfile = findViewById(R.id.ivProfile);

@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login);
+        setContentView(R.layout.activity_login);
 
         // Inicializar vistas
         etEmail = findViewById(R.id.etEmail);
@@ -54,13 +53,6 @@ public class LoginActivity extends AppCompatActivity {
             if (validarCampos(email, password)) {
                 realizarLogin(email, password);
             }
-        });
-
-
-        //borrar
-        Button inicio=findViewById(R.id.inicioRapido);
-        inicio.setOnClickListener(v ->{
-            iniciarMainActivity();
         });
 
 
