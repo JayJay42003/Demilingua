@@ -7,19 +7,24 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.demilingua.controller.CourseResponse;
+import com.example.demilingua.model.Curso;
 
 import java.util.List;
+import java.util.Map;
 
 public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseViewHolder> {
 
-    private final List<CourseResponse> items;
+    public interface OnCourseClickListener {
+        void onCourseClick(Curso curso);
+    }
+    private final List<Curso> items;
+    private final OnCourseClickListener listener;
 
-    public CourseAdapter(List<CourseResponse> items) {
+    public CourseAdapter(List<Curso> items, OnCourseClickListener listener) {
         this.items = items;
+        this.listener=listener;
     }
 
     @NonNull
@@ -32,10 +37,14 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
 
     @Override
     public void onBindViewHolder(@NonNull CourseViewHolder holder, int position) {
-        CourseResponse curso = items.get(position);
+        Curso curso = items.get(position);
         holder.tvNombre.setText(curso.getNombre());
         holder.tvDescripcion.setText(curso.getDescripcion());
-        holder.tvDificultad.setText("Nivel: " + curso.getDificultad());
+        holder.tvDificultad.setText(new StringBuilder().append("Nivel: ").append(curso.getDificultad()).toString());
+
+        holder.card.setOnClickListener(v -> {
+            if (listener != null) listener.onCourseClick(curso);
+        });
     }
 
     @Override
@@ -43,15 +52,19 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.CourseView
         return items.size();
     }
 
+
+
     // ───────────────────────── ViewHolder ─────────────────────────
     static class CourseViewHolder extends RecyclerView.ViewHolder {
         final TextView tvNombre, tvDescripcion, tvDificultad;
+        final View card;
 
         CourseViewHolder(@NonNull View itemView) {
             super(itemView);
             tvNombre      = itemView.findViewById(R.id.tvNombre);
             tvDescripcion = itemView.findViewById(R.id.tvDescripcion);
             tvDificultad  = itemView.findViewById(R.id.tvDificultad);
+            card = itemView.findViewById(R.id.cardCurso);
         }
     }
 }

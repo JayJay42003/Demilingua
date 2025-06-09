@@ -57,6 +57,13 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
+        //borrar
+        Button inicio=findViewById(R.id.inicioRapido);
+        inicio.setOnClickListener(v ->{
+            iniciarMainActivity();
+        });
+
+
     }
 
     private boolean validarCampos(String email, String password) {

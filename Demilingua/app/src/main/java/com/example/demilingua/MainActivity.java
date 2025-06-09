@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements LanguageAdapter.O
         languages.add(new Idioma(2, "Ingles", R.drawable.reino_unido));
         languages.add(new Idioma(3, "Frances", R.drawable.francia));
 
-        LanguageAdapter adapter = new LanguageAdapter(languages);
+        LanguageAdapter adapter = new LanguageAdapter(languages,this);
         rvLanguages.setAdapter(adapter);
 
     }

@@ -17,13 +17,15 @@ import java.util.List;
 public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.ViewHolder> {
 
     private List<Idioma> languages;
+    private OnLanguageClickListener listener;
 
     public interface OnLanguageClickListener {
         void onLanguageClick(Idioma idioma);
     }
 
-    public LanguageAdapter(List<Idioma> languages) {
+    public LanguageAdapter(List<Idioma> languages,OnLanguageClickListener listener) {
         this.languages = languages;
+        this.listener=listener;
     }
 
     @NonNull
@@ -42,8 +44,7 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.ViewHo
 
         holder.itemView.setOnClickListener(v -> {
             Toast.makeText(v.getContext(), "Seleccionado: " + language.getName(), Toast.LENGTH_SHORT).show();
-            // Aquí puedes abrir una actividad de aprendizaje del idioma
-
+            listener.onLanguageClick(language);
         });
     }
 

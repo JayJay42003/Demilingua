@@ -58,4 +58,8 @@
     <string name="yes">Si</string>
     <string name="no">No</string>
     <string name="save">Guardar</string>
+    <string name="test">Test</string>
+    <string name="next_question">Siguiente pregunta</string>
+    <string name="test_finished">Test acabado</string>
+    <string name="write_answer">Escribe tu respuesta</string>
 </resources>
