@@ -23,16 +23,16 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.ViewHo
         void onLanguageClick(Idioma idioma);
     }
 
-
-    public LanguageAdapter(List<Idioma> languages) {
+    public LanguageAdapter(List<Idioma> languages,OnLanguageClickListener listener) {
         this.languages = languages;
+        this.listener=listener;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.idioma_item, parent, false);
+                .inflate(R.layout.language_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -44,8 +44,7 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.ViewHo
 
         holder.itemView.setOnClickListener(v -> {
             Toast.makeText(v.getContext(), "Seleccionado: " + language.getName(), Toast.LENGTH_SHORT).show();
-            // Aquí puedes abrir una actividad de aprendizaje del idioma
-
+            listener.onLanguageClick(language);
         });
     }
 

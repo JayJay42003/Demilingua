@@ -2,64 +2,75 @@ package com.example.demilingua;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.google.android.material.snackbar.Snackbar;
-
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.view.View;
-import android.widget.Button;
-
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-
-import com.example.demilingua.databinding.ActivityPerfilBinding;
-
+/**
+ * Activity de perfil sencillo que muestra avatar, nombre y correo,
+ * y ofrece opciones para editar datos o cerrar sesión.
+ */
 public class PerfilActivity extends AppCompatActivity {
 
-    private AppBarConfiguration appBarConfiguration;
-    private ActivityPerfilBinding binding;
-    private Button btnLogout;
+    private static final String PREFS = "AppPrefs";
+
+    private ImageView ivProfile;
+    private TextView tvName, tvEmail;
+    private Button btnEdit, btnLogout;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_profile);     // usa el ScrollView modelo
 
-        binding = ActivityPerfilBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        // ───── Vistas ─────
+        ivProfile = findViewById(R.id.ivProfile);
+        tvName    = findViewById(R.id.tvName);
+        tvEmail   = findViewById(R.id.tvEmail);
+        btnEdit   = findViewById(R.id.btnEditProfile);
+        btnLogout = findViewById(R.id.btnLogout);
 
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_perfil);
-        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        // ───── Cargar datos del usuario ─────
+        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+        String nombre = prefs.getString("userName", "Usuario Ejemplo");
+        String correo = prefs.getString("userEmail", "usuario@example.com");
+        tvName.setText(nombre);
+        tvEmail.setText(correo);
 
 
+        Drawable avatar = getResources().getDrawable(R.drawable.profile, getTheme());
+        ivProfile.setImageDrawable(avatar);
 
-        // Cerrar Sesión
-        btnLogout = binding.btnLogout;
-        btnLogout.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Cerrar Sesión")
-                    .setMessage("¿Estás seguro?")
-                    .setPositiveButton("Sí", (dialog, which) -> {
-                        SharedPreferences prefs = getSharedPreferences("MisPreferencias", MODE_PRIVATE);
-                        prefs.edit().putBoolean("isLoggedIn", false).apply();
-                        startActivity(new Intent(this, LoginActivity.class));
-                        finish();
-                    })
-                    .setNegativeButton("No", null)
-                    .show();
+        // ───── Editar perfil ─────
+        btnEdit.setOnClickListener(v -> {
+            Intent i = new Intent(this, EditProfileActivity.class);
+            startActivity(i);
         });
 
+        // ───── Cerrar sesión ─────
+        btnLogout.setOnClickListener(v -> mostrarDialogoLogout());
     }
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_perfil);
-        return NavigationUI.navigateUp(navController, appBarConfiguration)
-                || super.onSupportNavigateUp();
+    private void mostrarDialogoLogout() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.logout)
+                .setMessage("¿Seguro que quieres cerrar sesión?")
+                .setPositiveButton(R.string.yes, (d, w) -> {
+                    getSharedPreferences(PREFS, MODE_PRIVATE)
+                            .edit()
+                            .putBoolean("isLoggedIn", false)
+                            .apply();
+                    startActivity(new Intent(this, LoginActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
+                    finish();
+                })
+                .setNegativeButton(R.string.no, null)
+                .show();
     }
 }
