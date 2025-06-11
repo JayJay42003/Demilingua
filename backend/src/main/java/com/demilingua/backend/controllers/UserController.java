@@ -51,6 +51,7 @@ public class UserController {
                 // Usuario válido
                 respuesta.put("status", "ok");
                 respuesta.put("user_id", String.valueOf(rs.getInt("id")));
+                 respuesta.put("nombre" , rs.getString("nombre"));
             } else {
                 respuesta.put("status", "error");
                 respuesta.put("message", "Usuario o contraseña incorrectos");

@@ -43,8 +43,7 @@ public class PerfilActivity extends AppCompatActivity {
         tvName.setText(nombre);
         tvEmail.setText(correo);
 
-        // (Opcional) si guardas la URI de la foto, cárgala con Glide/Picasso.
-        // Drawable placeholder incluido en res/drawable/profile.png
+
         Drawable avatar = getResources().getDrawable(R.drawable.profile, getTheme());
         ivProfile.setImageDrawable(avatar);
 

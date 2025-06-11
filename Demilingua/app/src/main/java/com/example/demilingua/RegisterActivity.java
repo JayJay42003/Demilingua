@@ -166,7 +166,7 @@ public class RegisterActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = prefs.edit();
 
         editor.putBoolean("isLoggedIn", true);
-        editor.putInt("userId", response.getUserId());
+        editor.putInt("userId", response.getUser_id());
         editor.putString("userEmail", etCorreo.getText().toString().trim()); // del EditText
         editor.putString("userName", response.getNombre());
 

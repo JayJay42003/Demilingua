@@ -3,7 +3,7 @@ package com.example.demilingua.model;
 public class RankingItem {
     private final String usuario;
     private final String idioma;
-    private final int    puntos;
+    private final int puntos;
 
     public RankingItem(String usuario, String idioma, int puntos) {
         this.usuario = usuario;

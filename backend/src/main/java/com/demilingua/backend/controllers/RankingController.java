@@ -75,8 +75,7 @@ public class RankingController {
             int idiomaId = body.getOrDefault("idiomaId", 0);
             int puntos = body.getOrDefault("puntos", 0);
 
-            String sql = "INSERT INTO usuario_idioma (usuario_id, idioma_id, puntos) "
-                    + "VALUES (?,?,?) "
+            String sql = "INSERT INTO usuario_idioma (usuario_id, idioma_id, puntos) VALUES (?,?,?) "
                     + "ON DUPLICATE KEY UPDATE puntos = puntos + VALUES(puntos)";
 
             try (Connection c = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS); PreparedStatement ps = c.prepareStatement(sql)) {

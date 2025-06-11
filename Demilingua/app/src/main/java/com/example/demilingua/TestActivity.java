@@ -31,7 +31,7 @@ public class TestActivity extends AppCompatActivity {
     private ApiService api;
     private int cursoId;
 
-    /* lista de ejercicios cargados */
+    /*lista de ejercicios cargados*/
     private List<Map<String,Object>> ejercicios = new ArrayList<>();
     private int indice = 0;
     private int puntuacion = 0;
@@ -121,7 +121,6 @@ public class TestActivity extends AppCompatActivity {
                             "Error al enviar puntos", Toast.LENGTH_SHORT).show();
                 }
             });
-
             return;
         }
 
@@ -130,21 +129,20 @@ public class TestActivity extends AppCompatActivity {
 
         String op = (String) ej.get("opciones");
         tvOpciones.setText(TextUtils.isEmpty(op) ? "" :
-                op.replace("[","").replace("]","").replace("\"","").replace(",", "\n"));
+        op.replace("[","").replace("]","").replace("\"","").replace(",", "\n"));
     }
 
-    /* 3º: avanzar y sumar puntuación (modo demo) */
+
     private void mostrarSiguiente() {
 
         Map<String, Object> ej  = ejercicios.get(indice);
-        int puntos =pasarInt(ej.get("puntos"));          // puntos del ejercicio
-        String correcta = ((String) ej.get("respuesta")).trim();     // respuesta_correcta
+        int puntos =pasarInt(ej.get("puntos"));
+        String correcta = ((String) ej.get("respuesta")).trim();
 
 
         String usuario = etRespuesta.getText() != null
                 ? etRespuesta.getText().toString().trim()
                 : "";
-
 
         if (!usuario.isEmpty() && usuario.equalsIgnoreCase(correcta)) {
             puntuacion += puntos;
@@ -156,7 +154,6 @@ public class TestActivity extends AppCompatActivity {
                     "Incorrecto. Respuesta: " + correcta,
                     Toast.LENGTH_SHORT).show();
         }
-
 
         etRespuesta.setText("");
 
@@ -171,7 +168,7 @@ public class TestActivity extends AppCompatActivity {
     }
 
     private int pasarInt(Object o) {
-        if (o instanceof Number)   return ((Number) o).intValue();
+        if (o instanceof Number) return ((Number) o).intValue();
         if (o instanceof String) return Integer.parseInt(o.toString());
         return 0;
     }
