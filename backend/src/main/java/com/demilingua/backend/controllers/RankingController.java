@@ -36,10 +36,12 @@ public class RankingController {
     public List<Map<String, String>> getRanking() {
 
         String sql = "SELECT u.nombre AS usuario, i.nombre AS idioma, ui.puntos AS puntos "
-                + "FROM usuario_idioma ui "
-                + "JOIN usuario u ON u.id = ui.usuario_id "
-                + "JOIN idioma  i ON i.id = ui.idioma_id "
-                + "ORDER BY ui.puntos DESC";
+           + "FROM usuario_idioma ui "
+           + "JOIN usuario u ON u.id = ui.usuario_id "
+           + "JOIN idioma  i ON i.id = ui.idioma_id "
+           + "ORDER BY i.nombre  ASC,"
+           + "ui.puntos DESC";
+
 
         List<Map<String, String>> lista = new ArrayList<>();
 

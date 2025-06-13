@@ -105,7 +105,7 @@ public class TestActivity extends AppCompatActivity {
             body.put("idiomaId" , idiomaId);
             body.put("puntos"   , puntuacion);
 
-            api.enviarPuntos(body).enqueue(new Callback<>() {
+            api.insertPoints(body).enqueue(new Callback<>() {
                 @Override public void onResponse(Call<Map<String,String>> c,
                                                  Response<Map<String,String>> r) {
                     if (r.isSuccessful()) {

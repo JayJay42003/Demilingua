@@ -30,7 +30,7 @@ public interface ApiService {
     Call<List<Map<String,String>>> getRanking();
 
     @POST("api/puntos")
-    Call<Map<String,String>> enviarPuntos(@Body Map<String,Integer> body);
+    Call<Map<String,String>> insertPoints(@Body Map<String,Integer> body);
 
 
 }

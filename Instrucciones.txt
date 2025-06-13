@@ -1,0 +1,7 @@
+-Insertar el script de sql en un gestor de MySQL.
+-Guardar la carpeta de "Demilingua" para luego poder abrirla desde Android Studio.
+-Guardar la carpeta "backend" para luego abrirla desde NetBeans.
+
+-Iniciar el servicio de MySQL para poder hacer las consultas.
+-Luego pasar al del backend, que gestionará las APIs.
+-Y por último arrancar la aplicación desde Android Studio.
