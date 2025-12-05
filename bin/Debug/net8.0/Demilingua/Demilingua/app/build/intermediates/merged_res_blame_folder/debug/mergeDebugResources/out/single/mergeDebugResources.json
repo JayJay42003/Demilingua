@@ -1,0 +1,146 @@
+[
+    {
+        "merged": "com.example.demilingua.app-debug-44:/layout_activity_main.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "com.example.demilingua.app-main-46:/mipmap-mdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/xml_data_extraction_rules.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/xml/data_extraction_rules.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/drawable_email.jpg.flat",
+        "source": "com.example.demilingua.app-main-46:/drawable/email.jpg"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/layout_activity_login.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/layout/activity_login.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/layout_activity_course.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/layout/activity_course.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/xml_backup_rules.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/xml/backup_rules.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/drawable_lock.jpg.flat",
+        "source": "com.example.demilingua.app-main-46:/drawable/lock.jpg"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/layout_course_item.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/layout/course_item.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/layout_activity_register.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/layout/activity_register.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "com.example.demilingua.app-main-46:/mipmap-hdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "com.example.demilingua.app-main-46:/mipmap-xxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/layout_activity_test.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/layout/activity_test.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.example.demilingua.app-main-46:/mipmap-xxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/drawable_profile.jpg.flat",
+        "source": "com.example.demilingua.app-main-46:/drawable/profile.jpg"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/drawable_reino_unido.webp.flat",
+        "source": "com.example.demilingua.app-main-46:/drawable/reino_unido.webp"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "com.example.demilingua.app-main-46:/mipmap-xxxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/layout_activity_splash.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/layout/activity_splash.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.example.demilingua.app-main-46:/mipmap-xxxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "com.example.demilingua.app-main-46:/mipmap-xhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/layout_activity_profile.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/layout/activity_profile.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "com.example.demilingua.app-main-46:/mipmap-hdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "com.example.demilingua.app-main-46:/mipmap-xhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/drawable_espa_a.png.flat",
+        "source": "com.example.demilingua.app-main-46:/drawable/espa_a.png"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/layout_language_item.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/layout/language_item.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/drawable_francia.jpg.flat",
+        "source": "com.example.demilingua.app-main-46:/drawable/francia.jpg"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/xml_network_security_config.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/xml/network_security_config.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "com.example.demilingua.app-main-46:/mipmap-mdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/drawable_icon.png.flat",
+        "source": "com.example.demilingua.app-main-46:/drawable/icon.png"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/layout_activity_edit_profile.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/layout/activity_edit_profile.xml"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/drawable_logo.jpeg.flat",
+        "source": "com.example.demilingua.app-main-46:/drawable/logo.jpeg"
+    },
+    {
+        "merged": "com.example.demilingua.app-debug-44:/layout_item_ranking.xml.flat",
+        "source": "com.example.demilingua.app-main-46:/layout/item_ranking.xml"
+    }
+]
