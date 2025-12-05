@@ -1,3 +1,4 @@
+-Tener XAMPP para la bbdd
 -Insertar el script de sql en un gestor de MySQL.
 -Guardar la carpeta de "Demilingua" para luego poder abrirla desde Android Studio.
 -Guardar la carpeta "backend" para luego abrirla desde NetBeans.
