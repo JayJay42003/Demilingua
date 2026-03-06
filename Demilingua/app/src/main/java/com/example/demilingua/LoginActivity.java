@@ -83,9 +83,8 @@ public class LoginActivity extends AppCompatActivity {
     private void realizarLogin(String email, String password) {
         btnLogin.setEnabled(false);
 
-        // Crear el mapa correctamente (username/password en lugar de correo/contrasena)
         Map<String, String> data = new HashMap<>();
-        data.put("username", email);  // Cambiado a "username" para coincidir con tu endpoint
+        data.put("username", email);
         data.put("password", password);
 
         ApiService apiService = RetrofitClient.getApiService();
@@ -107,7 +106,7 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    // Manejo de errores HTTP (4xx, 5xx)
+                    // Manejo de errores HTTP
                     try {
                         String errorBody = response.errorBody() != null ?
                                 response.errorBody().string() : "Error desconocido";
@@ -131,7 +130,7 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = prefs.edit();
 
         editor.putBoolean("isLoggedIn", true);
-        editor.putInt("userId", response.getUserId());
+        editor.putInt("userId", response.getUser_id());
         editor.putString("userEmail", etEmail.getText().toString().trim());
         editor.putString("userName", response.getNombre());
 

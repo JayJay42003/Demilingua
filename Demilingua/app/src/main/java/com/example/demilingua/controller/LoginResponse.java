@@ -3,7 +3,7 @@ package com.example.demilingua.controller;
 public class LoginResponse {
     private String status;
     private String message;
-    private int userId;
+    private int user_id;
     private String nombre;
 
     // Constructor vacío necesario para Retrofit
@@ -30,12 +30,12 @@ public class LoginResponse {
         this.message = message;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getUser_id() {
+        return user_id;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
     }
 
     public String getNombre() {

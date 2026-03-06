@@ -42,6 +42,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"/>
 
+    <View
+        android:id="@+id/divider1"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="?android:attr/listDivider" />
+
     <!-- Ranking header -->
     <TextView
         android:id="@+id/tvRankingHeader"
@@ -50,9 +56,17 @@
         android:text="@string/ranking"
         android:layout_gravity="center"
         android:textStyle="bold"
-        android:textSize="18sp"
+        android:textColor="@color/red_500"
+        android:textSize="20sp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"/>
+        />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="?android:attr/listDivider" />
+
 
     <!-- RecyclerView Ranking -->
     <androidx.recyclerview.widget.RecyclerView

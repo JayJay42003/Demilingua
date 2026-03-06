@@ -40,13 +40,12 @@ public class MainActivity extends AppCompatActivity implements LanguageAdapter.O
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        // Botón Perfil
         btnProfile = findViewById(R.id.btnProfile);
         btnProfile.setOnClickListener(v -> {
             startActivity(new Intent(this, PerfilActivity.class));
         });
 
-        // RecyclerView
+        /*Idiomas*/
         rvLanguages = findViewById(R.id.rvLanguages);
         rvLanguages.setLayoutManager(new LinearLayoutManager(this));
 
@@ -58,14 +57,13 @@ public class MainActivity extends AppCompatActivity implements LanguageAdapter.O
         LanguageAdapter adapter = new LanguageAdapter(languages,this);
         rvLanguages.setAdapter(adapter);
 
-        /* RecyclerView Ranking */
+        /*Ranking*/
         RecyclerView rvRank = findViewById(R.id.rvRanking);
         rvRank.setLayoutManager(new LinearLayoutManager(this));
         rankingAdapter = new RankingAdapter(rankingList);
         rvRank.setAdapter(rankingAdapter);
 
         cargarRanking();
-
     }
 
     private void cargarRanking() {
@@ -96,6 +94,11 @@ public class MainActivity extends AppCompatActivity implements LanguageAdapter.O
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        cargarRanking();
+    }
 
     @Override
     public void onLanguageClick(Idioma idioma) {
