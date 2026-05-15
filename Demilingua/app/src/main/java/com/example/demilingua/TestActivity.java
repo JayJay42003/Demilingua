@@ -100,12 +100,8 @@ public class TestActivity extends AppCompatActivity {
             btnNext.setEnabled(false);
             etRespuesta.setEnabled(false);
 
-            Map<String,Integer> body = new HashMap<>();
-            body.put("usuarioId", usuarioId);
-            body.put("idiomaId" , idiomaId);
-            body.put("puntos"   , puntuacion);
-
-            api.insertPoints(body).enqueue(new Callback<>() {
+            // Pasamos los 3 enteros directamente, sin crear el HashMap
+            api.insertPoints(usuarioId, idiomaId, puntuacion).enqueue(new Callback<Map<String, String>>() {
                 @Override public void onResponse(Call<Map<String,String>> c,
                                                  Response<Map<String,String>> r) {
                     if (r.isSuccessful()) {
@@ -134,11 +130,9 @@ public class TestActivity extends AppCompatActivity {
 
 
     private void mostrarSiguiente() {
-
-        Map<String, Object> ej  = ejercicios.get(indice);
-        int puntos =pasarInt(ej.get("puntos"));
+        Map<String, Object> ej = ejercicios.get(indice);
+        int puntos = pasarInt(ej.get("puntos"));
         String correcta = ((String) ej.get("respuesta")).trim();
-
 
         String usuario = etRespuesta.getText() != null
                 ? etRespuesta.getText().toString().trim()
@@ -146,19 +140,58 @@ public class TestActivity extends AppCompatActivity {
 
         if (!usuario.isEmpty() && usuario.equalsIgnoreCase(correcta)) {
             puntuacion += puntos;
-            Toast.makeText(this,
-                    "¡Correcto! +" + puntos + " puntos",
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "¡Correcto! +" + puntos + " puntos", Toast.LENGTH_SHORT).show();
+            avanzarEjercicio(); // Si acierta, pasa al siguiente
         } else {
-            Toast.makeText(this,
-                    "Incorrecto. Respuesta: " + correcta,
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Incorrecto. Era: " + correcta, Toast.LENGTH_SHORT).show();
+            restarVida(); // Si falla, llamamos a la API para quitar vida
         }
+    }
 
+    private void avanzarEjercicio() {
         etRespuesta.setText("");
-
         indice++;
-        mostrarEjercicioActual();
+        if (indice < ejercicios.size()) {
+            mostrarEjercicioActual();
+        } else {
+            terminarTest(); // Si ya no hay ejercicios, guardamos los puntos
+        }
+    }
+
+    private void restarVida() {
+        api.perderVida(usuarioId).enqueue(new Callback<Map<String, String>>() {
+            @Override
+            public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    String status = response.body().get("status");
+                    if ("sin_vidas".equals(status)) {
+                        Toast.makeText(TestActivity.this, "¡Te has quedado sin vidas!", Toast.LENGTH_LONG).show();
+                        finish(); // Echa al usuario si sus vidas llegan a 0
+                    } else {
+                        avanzarEjercicio(); // Aún le quedan vidas, avanza
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call<Map<String, String>> call, Throwable t) {
+                avanzarEjercicio(); // Fallback por si falla internet
+            }
+        });
+    }
+
+    private void terminarTest() {
+        // Al terminar, sumamos la experiencia total conseguida
+        api.insertPoints(usuarioId, idiomaId, puntuacion).enqueue(new Callback<Map<String, String>>() {
+            @Override
+            public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+                Toast.makeText(TestActivity.this, "Test finalizado. Total: " + puntuacion + " XP", Toast.LENGTH_LONG).show();
+                finish(); // Volver al menú
+            }
+            @Override
+            public void onFailure(Call<Map<String, String>> call, Throwable t) {
+                finish();
+            }
+        });
     }
 
 

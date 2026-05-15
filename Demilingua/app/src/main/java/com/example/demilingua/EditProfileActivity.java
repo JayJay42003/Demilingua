@@ -90,16 +90,13 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         }
 
+        // 1. Obtenemos el ID del usuario directamente
+        int usuarioId = prefs.getInt("userId", 0);
 
-        Map<String, String> body = new HashMap<>();
-        body.put("id"     , String.valueOf(prefs.getInt("userId", 0)));
-        body.put("nombre" , nombre);
-        body.put("correo" , correo);
-        body.put("contrasena", pass);   // Puede ir vacío
+        // 2. Llamada Retrofit usando las variables reales: usuarioId, nombre y correo
+        Call<Map<String,String>> call = api.updateUser(usuarioId, nombre, correo);
 
-        // Llamada Retrofit
-        Call<Map<String,String>> call = api.updateUser(body);
-        call.enqueue(new Callback<>() {
+        call.enqueue(new Callback<Map<String, String>>() {
             @Override
             public void onResponse(Call<Map<String,String>> call,
                                    Response<Map<String,String>> res) {
@@ -107,12 +104,11 @@ public class EditProfileActivity extends AppCompatActivity {
                 if (res.isSuccessful() && res.body() != null
                         && "ok".equals(res.body().get("status"))) {
 
-
+                    // Guardar los nuevos datos en el dispositivo
                     prefs.edit()
                             .putString("userName" , nombre)
                             .putString("userEmail", correo)
                             .apply();
-
 
                     Toast.makeText(EditProfileActivity.this,
                             "Perfil actualizado",

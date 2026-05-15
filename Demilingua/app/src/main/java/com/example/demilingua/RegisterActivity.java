@@ -2,11 +2,14 @@ package com.example.demilingua;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.demilingua.controller.ApiService;
@@ -15,8 +18,9 @@ import com.example.demilingua.controller.RetrofitClient;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -108,57 +112,63 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void registrarUsuario(String nombre, String correo, String contrasena) {
-        // Aquí iría la conexión con tu base de datos
-        HashMap<String,String> datos=new HashMap<>();
-        datos.put("nombre",nombre);
-        datos.put("correo",correo);
-        datos.put("contrasena",contrasena);
-
+        btnRegistrar.setEnabled(false);
         ApiService apiService = RetrofitClient.getApiService();
-        apiService.register(datos).enqueue(new Callback<LoginResponse>() {
+        
+        // Se pasan los parámetros individualmente como requiere la interfaz ApiService
+        apiService.register(nombre, correo, contrasena).enqueue(new Callback<Map<String, String>>() {
             @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-
+            public void onResponse(@NonNull Call<Map<String, String>> call, @NonNull Response<Map<String, String>> response) {
+                btnRegistrar.setEnabled(true);
                 if (response.isSuccessful() && response.body() != null) {
-                    LoginResponse loginResponse = response.body();
+                    Map<String, String> bodyMap = response.body();
 
-                    if (loginResponse.isSuccess()) {
+                    if ("ok".equals(bodyMap.get("status"))) {
+                        // Crear LoginResponse a partir del Map para mantener compatibilidad
+                        LoginResponse loginResponse = new LoginResponse();
+                        loginResponse.setStatus("ok");
+                        loginResponse.setNombre(bodyMap.get("nombre"));
+                        String userIdStr = bodyMap.get("user_id");
+                        if (userIdStr != null) {
+                            try {
+                                loginResponse.setUser_id(Integer.parseInt(userIdStr));
+                            } catch (NumberFormatException e) {
+                                Log.e("RegisterActivity", "Error al parsear user_id", e);
+                            }
+                        }
+
                         guardarSesion(loginResponse);
+                        
+                        // Guardar en UsuarioPrefs como en el código original
+                        getSharedPreferences("UsuarioPrefs", MODE_PRIVATE)
+                                .edit()
+                                .putString("nombre", nombre)
+                                .putString("correo", correo)
+                                .apply();
+
+                        Toast.makeText(RegisterActivity.this, "Registro exitoso para: " + nombre, Toast.LENGTH_SHORT).show();
+                        finish(); // Regresar a Login
                     } else {
-                        String errorMsg = loginResponse.getMessage() != null ?
-                                loginResponse.getMessage() : "Credenciales no válidas";
+                        String errorMsg = bodyMap.get("message") != null ?
+                                bodyMap.get("message") : "Error en el registro";
                         Toast.makeText(RegisterActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    // Manejo de errores HTTP (4xx, 5xx)
-                    try {
-                        String errorBody = response.errorBody() != null ?
-                                response.errorBody().string() : "Error desconocido";
-                        Toast.makeText(RegisterActivity.this, "Error: " + errorBody, Toast.LENGTH_SHORT).show();
+                    try (ResponseBody errorBody = response.errorBody()) {
+                        String errorBodyString = errorBody != null ? errorBody.string() : "Error desconocido";
+                        Toast.makeText(RegisterActivity.this, "Error: " + errorBodyString, Toast.LENGTH_SHORT).show();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Log.e("RegisterActivity", "Error al leer errorBody", e);
                     }
                 }
             }
 
             @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<Map<String, String>> call, @NonNull Throwable t) {
                 btnRegistrar.setEnabled(true);
                 Toast.makeText(RegisterActivity.this, "Error de conexión: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
-        Toast.makeText(this, "Registro exitoso para: " + nombre, Toast.LENGTH_SHORT).show();
-
-        // Ejemplo de cómo guardaríamos en SharedPreferences
-
-        getSharedPreferences("UsuarioPrefs", MODE_PRIVATE)
-            .edit()
-            .putString("nombre", nombre)
-            .putString("correo", correo)
-            .apply();
-
-        finish(); // Regresar a Login
     }
 
     private void guardarSesion(LoginResponse response) {
@@ -167,7 +177,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         editor.putBoolean("isLoggedIn", true);
         editor.putInt("userId", response.getUser_id());
-        editor.putString("userEmail", etCorreo.getText().toString().trim()); // del EditText
+        editor.putString("userEmail", etCorreo.getText().toString().trim());
         editor.putString("userName", response.getNombre());
 
         editor.apply();
@@ -177,5 +187,4 @@ public class RegisterActivity extends AppCompatActivity {
         if (item.getItemId()==android.R.id.home){ finish(); return true; }
         return super.onOptionsItemSelected(item);
     }
-
 }

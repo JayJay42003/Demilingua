@@ -5,13 +5,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.demilingua.model.Idioma;
-
 import java.util.List;
 
 public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.ViewHolder> {
@@ -23,9 +19,9 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.ViewHo
         void onLanguageClick(Idioma idioma);
     }
 
-    public LanguageAdapter(List<Idioma> languages,OnLanguageClickListener listener) {
+    public LanguageAdapter(List<Idioma> languages, OnLanguageClickListener listener) {
         this.languages = languages;
-        this.listener=listener;
+        this.listener = listener;
     }
 
     @NonNull
@@ -38,18 +34,31 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Idioma language = languages.get(position);
-        holder.ivIcon.setImageResource(language.getIcon());
-        holder.tvName.setText(language.getName());
+        // Correcciones aplicadas aquí:
+        Idioma idioma = languages.get(position);
+        holder.tvName.setText(idioma.getName());
+
+        String langName = idioma.getName().toLowerCase();
+
+        if (langName.contains("inglés") || langName.contains("ingles")) {
+            holder.ivIcon.setImageResource(R.drawable.reino_unido);
+        } else if (langName.contains("francés") || langName.contains("frances")) {
+            holder.ivIcon.setImageResource(R.drawable.francia);
+        } else if (langName.contains("español") || langName.contains("espanol")) {
+            holder.ivIcon.setImageResource(R.drawable.espa_a);
+        } else {
+            holder.ivIcon.setImageResource(R.drawable.logo);
+        }
 
         holder.itemView.setOnClickListener(v -> {
-            Toast.makeText(v.getContext(), "Seleccionado: " + language.getName(), Toast.LENGTH_SHORT).show();
-            listener.onLanguageClick(language);
+            if (listener != null) listener.onLanguageClick(idioma);
         });
     }
 
     @Override
-    public int getItemCount() { return languages.size(); }
+    public int getItemCount() {
+        return languages.size();
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivIcon;

@@ -9,9 +9,9 @@ public class RetrofitClient {
     private static final String BASE_URL = "http://10.0.2.2:8080/";
     private static Retrofit retrofit = null;
 
-    public static ApiService getApiService() {
+    // 1. EL MÉTODO NUEVO (Para la lógica de vidas y experiencia)
+    public static Retrofit getClient() {
         if (retrofit == null) {
-            // Configurar logs de las peticiones
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -25,6 +25,11 @@ public class RetrofitClient {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
-        return retrofit.create(ApiService.class);
+        return retrofit;
+    }
+
+    // 2. EL MÉTODO RECICLADO (Evita que LoginActivity y RegisterActivity se pongan en rojo)
+    public static ApiService getApiService() {
+        return getClient().create(ApiService.class);
     }
 }

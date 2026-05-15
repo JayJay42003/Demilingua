@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +29,9 @@ public class MainActivity extends AppCompatActivity implements LanguageAdapter.O
     private RecyclerView rvLanguages;
     private ImageButton btnProfile;
     private RankingAdapter rankingAdapter;
+
+    private TextView tvVidas, tvRacha;
+    private ImageButton btnAmigos;
     private final List<RankingItem> rankingList = new ArrayList<>();
 
     @Override
@@ -44,6 +48,14 @@ public class MainActivity extends AppCompatActivity implements LanguageAdapter.O
         btnProfile.setOnClickListener(v -> {
             startActivity(new Intent(this, PerfilActivity.class));
         });
+
+        tvVidas = findViewById(R.id.tvVidas);
+        tvRacha = findViewById(R.id.tvRacha);
+        btnAmigos = findViewById(R.id.btnAmigos);
+
+        if (btnAmigos != null) {
+            btnAmigos.setOnClickListener(v -> startActivity(new Intent(this, AmigosActivity.class)));
+        }
 
         /*Idiomas*/
         rvLanguages = findViewById(R.id.rvLanguages);
@@ -89,6 +101,27 @@ public class MainActivity extends AppCompatActivity implements LanguageAdapter.O
         });
     }
 
+    private void comprobarEstadoVidas() {
+        int userId = getSharedPreferences("AppPrefs", MODE_PRIVATE).getInt("userId", -1);
+        if (userId == -1) return;
+
+        ApiService api = RetrofitClient.getApiService();
+        api.getStatusVidas(userId).enqueue(new Callback<Map<String, String>>() {
+            @Override
+            public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    String vidas = response.body().get("vidas");
+                    String racha = response.body().get("racha");
+
+                    tvVidas.setText("❤️ " + vidas);
+                    tvRacha.setText("🔥 " + racha);
+                }
+            }
+            @Override
+            public void onFailure(Call<Map<String, String>> call, Throwable t) {}
+        });
+    }
+
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId()==android.R.id.home){ finish(); return true; }
         return super.onOptionsItemSelected(item);
@@ -98,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements LanguageAdapter.O
     protected void onResume() {
         super.onResume();
         cargarRanking();
+        comprobarEstadoVidas(); // Actualiza vidas y racha cada vez que vuelves al menú
     }
 
     @Override
