@@ -83,12 +83,12 @@ public class LoginActivity extends AppCompatActivity {
     private void realizarLogin(String email, String password) {
         btnLogin.setEnabled(false);
 
-        Map<String, String> data = new HashMap<>();
-        data.put("username", email);
-        data.put("password", password);
+        Map<String, String> credentials = new HashMap<>();
+        credentials.put("correo", email);
+        credentials.put("contrasena", password);
 
         ApiService apiService = RetrofitClient.getApiService();
-        apiService.login(data).enqueue(new Callback<LoginResponse>() {
+        apiService.login(credentials).enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 btnLogin.setEnabled(true);
