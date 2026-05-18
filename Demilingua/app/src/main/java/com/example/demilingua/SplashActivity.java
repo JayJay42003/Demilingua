@@ -37,7 +37,7 @@ public class SplashActivity extends AppCompatActivity {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                SharedPreferences prefs = getSharedPreferences("MisPreferencias", MODE_PRIVATE);
+                SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
                 boolean isLoggedIn = prefs.getBoolean("isLoggedIn", false);
 
                 Intent intent;

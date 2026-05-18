@@ -9,19 +9,19 @@ public class Curso {
     private String nombre;
     private String descripcion;
     private String dificultad;
-    private int idiomaId;
+    private int idioma_id;
 
     // Constructores
     public Curso() {
         // Constructor vacío necesario para frameworks
     }
 
-    public Curso(int id, String nombre, String descripcion, String dificultad, int idiomaId) {
+    public Curso(int id, String nombre, String descripcion, String dificultad, int idioma_id) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.dificultad = dificultad;
-        this.idiomaId = idiomaId;
+        this.idioma_id = idioma_id;
     }
 
     // Getters y Setters
@@ -63,15 +63,15 @@ public class Curso {
         this.dificultad = dificultad;
     }
 
-    public int getIdiomaId() {
-        return idiomaId;
+    public int getIdioma_id() {
+        return idioma_id;
     }
 
-    public void setIdiomaId(int idiomaId) {
-        if (idiomaId <= 0) {
+    public void setIdioma_id(int idioma_id) {
+        if (idioma_id <= 0) {
             throw new IllegalArgumentException("El ID del idioma debe ser positivo");
         }
-        this.idiomaId = idiomaId;
+        this.idioma_id = idioma_id;
     }
 
     // Métodos útiles
@@ -81,7 +81,7 @@ public class Curso {
                 "id=" + id +
                 ", nombre='" + nombre + '\'' +
                 ", dificultad='" + dificultad + '\'' +
-                ", idiomaId=" + idiomaId +
+                ", idioma_id=" + idioma_id +
                 '}';
     }
 

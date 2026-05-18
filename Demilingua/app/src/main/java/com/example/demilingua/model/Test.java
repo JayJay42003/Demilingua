@@ -5,7 +5,7 @@ package com.example.demilingua.model;
  */
 public class Test {
     private int id;
-    private int cursoId;
+    private int curso_id;
     private String titulo;
 
     // Constructores
@@ -13,9 +13,9 @@ public class Test {
         // Constructor vacío necesario para frameworks
     }
 
-    public Test(int id, int cursoId, String titulo) {
+    public Test(int id, int curso_id, String titulo) {
         this.id = id;
-        this.cursoId = cursoId;
+        this.curso_id = curso_id;
         this.titulo = titulo;
     }
 
@@ -28,15 +28,15 @@ public class Test {
         this.id = id;
     }
 
-    public int getCursoId() {
-        return cursoId;
+    public int getCurso_id() {
+        return curso_id;
     }
 
-    public void setCursoId(int cursoId) {
-        if (cursoId <= 0) {
+    public void setCurso_id(int curso_id) {
+        if (curso_id <= 0) {
             throw new IllegalArgumentException("El ID del curso debe ser positivo");
         }
-        this.cursoId = cursoId;
+        this.curso_id = curso_id;
     }
 
     public String getTitulo() {
@@ -58,7 +58,7 @@ public class Test {
     public String toString() {
         return "Test{" +
                 "id=" + id +
-                ", cursoId=" + cursoId +
+                ", curso_id=" + curso_id +
                 ", titulo='" + titulo + '\'' +
                 '}';
     }
@@ -71,7 +71,7 @@ public class Test {
         if (titulo == null || titulo.trim().isEmpty()) {
             throw new IllegalArgumentException("El título del test es requerido");
         }
-        if (cursoId <= 0) {
+        if (curso_id <= 0) {
             throw new IllegalArgumentException("ID de curso inválido");
         }
     }

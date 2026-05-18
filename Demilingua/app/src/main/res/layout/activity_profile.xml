@@ -8,7 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="24dp"
+        android:background="@color/background_light">
 
         <ImageView
             android:id="@+id/ivProfile"
@@ -18,14 +19,24 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="16dp"/>
 
+        <ProgressBar
+            android:id="@+id/pbProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp"
+            android:indeterminateTint="@color/primary_purple"/>
+
         <TextView
             android:id="@+id/tvName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Usuario Ejemplo"
-            android:textSize="20sp"
+            android:textSize="22sp"
             android:layout_gravity="center_horizontal"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:textColor="@color/primary_purple"/>
 
         <TextView
             android:id="@+id/tvEmail"
@@ -33,14 +44,16 @@
             android:layout_height="wrap_content"
             android:text="usuario@example.com"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp"
+            android:textColor="@color/gray_500"/>
 
         <Button
             android:id="@+id/btnEditProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/edit_profile"
-            android:layout_marginTop="24dp"/>
+            android:layout_marginTop="32dp"
+            android:backgroundTint="@color/primary_purple"/>
 
         <!-- Botón Cerrar Sesión -->
         <Button
@@ -48,7 +61,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/logout"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:backgroundTint="@color/red_500"
             android:textColor="@color/white"/>
     </LinearLayout>

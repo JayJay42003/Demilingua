@@ -23,6 +23,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import android.view.View;
+import android.widget.ProgressBar;
+
 /**
  * Permite al usuario editar nombre, correo **y contraseña**.
  * Los datos se guardan en SharedPreferences.
@@ -32,7 +35,8 @@ public class EditProfileActivity extends AppCompatActivity {
     private static final String PREFS = "AppPrefs";
 
     private EditText etName, etEmail, etPassword, etConfirm;
-    private Button btnSave;
+    private Button btnSave, btnDeleteAccount;
+    private ProgressBar pbEdit;
     private SharedPreferences prefs;
     private ApiService api;
 
@@ -53,6 +57,8 @@ public class EditProfileActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         etConfirm = findViewById(R.id.etConfirmarContrasena);
         btnSave = findViewById(R.id.btnSave);
+        btnDeleteAccount = findViewById(R.id.btnDeleteAccount);
+        pbEdit = findViewById(R.id.pbEditProfile);
 
         // Cargar datos actuales
         prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
@@ -63,6 +69,40 @@ public class EditProfileActivity extends AppCompatActivity {
         api = RetrofitClient.getApiService();
 
         btnSave.setOnClickListener(v -> guardarCambios());
+        btnDeleteAccount.setOnClickListener(v -> confirmarBorradoCuenta());
+    }
+
+    private void confirmarBorradoCuenta() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("¿Borrar cuenta?")
+                .setMessage("Esta acción es permanente y perderás todo tu progreso.")
+                .setPositiveButton("Borrar", (d, w) -> borrarCuenta())
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    private void borrarCuenta() {
+        int usuarioId = prefs.getInt("userId", 0);
+        if (pbEdit != null) pbEdit.setVisibility(View.VISIBLE);
+        
+        api.deleteUser(usuarioId).enqueue(new Callback<Map<String, String>>() {
+            @Override
+            public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+                if (response.isSuccessful()) {
+                    prefs.edit().clear().apply();
+                    android.content.Intent intent = new android.content.Intent(EditProfileActivity.this, LoginActivity.class);
+                    intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Map<String, String>> call, Throwable t) {
+                if (pbEdit != null) pbEdit.setVisibility(View.GONE);
+                Toast.makeText(EditProfileActivity.this, "Error al borrar cuenta", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
@@ -93,13 +133,20 @@ public class EditProfileActivity extends AppCompatActivity {
         // 1. Obtenemos el ID del usuario directamente
         int usuarioId = prefs.getInt("userId", 0);
 
-        // 2. Llamada Retrofit usando las variables reales: usuarioId, nombre y correo
-        Call<Map<String,String>> call = api.updateUser(usuarioId, nombre, correo);
+        // 2. Llamada Retrofit usando las variables reales: usuarioId, nombre, correo y pass (opcional)
+        if (pbEdit != null) pbEdit.setVisibility(View.VISIBLE);
+        btnSave.setEnabled(false);
+        
+        // Si pass está vacío, enviamos null para que el backend no la actualice
+        String passToSend = TextUtils.isEmpty(pass) ? null : pass;
+        Call<Map<String,String>> call = api.updateUser(usuarioId, nombre, correo, passToSend);
 
         call.enqueue(new Callback<Map<String, String>>() {
             @Override
             public void onResponse(Call<Map<String,String>> call,
                                    Response<Map<String,String>> res) {
+                if (pbEdit != null) pbEdit.setVisibility(View.GONE);
+                btnSave.setEnabled(true);
 
                 if (res.isSuccessful() && res.body() != null
                         && "ok".equals(res.body().get("status"))) {
@@ -124,6 +171,8 @@ public class EditProfileActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Map<String,String>> call, Throwable t) {
+                if (pbEdit != null) pbEdit.setVisibility(View.GONE);
+                btnSave.setEnabled(true);
                 Toast.makeText(EditProfileActivity.this,
                         "Sin conexión: " + t.getMessage(),
                         Toast.LENGTH_LONG).show();

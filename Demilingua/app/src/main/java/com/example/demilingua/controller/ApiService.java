@@ -15,11 +15,22 @@ public interface ApiService {
     @POST("api/users")
     Call<Map<String, String>> register(@Query("nombre") String nombre, @Query("correo") String correo, @Query("contrasena") String contrasena);
 
-    @GET("api/users/search")
+    @GET("api/users")
     Call<List<Map<String, String>>> searchUsers(@Query("query") String query);
 
+    @GET("api/users/{id}")
+    Call<Map<String, String>> getUserById(@Path("id") int id);
+
     @PUT("api/users/{id}")
-    Call<Map<String, String>> updateUser(@Path("id") int id, @Query("nombre") String nombre, @Query("correo") String correo);
+    Call<Map<String, String>> updateUser(
+            @Path("id") int id, 
+            @Query("nombre") String nombre, 
+            @Query("correo") String correo,
+            @Query("contrasena") String contrasena
+    );
+
+    @DELETE("api/users/{id}")
+    Call<Map<String, String>> deleteUser(@Path("id") int id);
 
     // --- GAMIFICACIÓN ---
     @GET("api/gamification/status/{usuarioId}")
@@ -35,8 +46,14 @@ public interface ApiService {
     @GET("api/friends/{usuarioId}")
     Call<List<Map<String, String>>> getFriends(@Path("usuarioId") int usuarioId);
 
-    @POST("api/friends/request")
-    Call<Map<String, String>> sendFriendRequest(@Query("usuarioId") int usuarioId, @Query("amigoId") int amigoId);
+    @POST("api/friends")
+    Call<Map<String, String>> sendFriendRequest(@Query("usuarioId1") int usuarioId1, @Query("usuarioId2") int usuarioId2);
+
+    @PUT("api/friends")
+    Call<Map<String, String>> acceptFriend(@Query("usuarioId1") int usuarioId1, @Query("usuarioId2") int usuarioId2);
+
+    @DELETE("api/friends")
+    Call<Map<String, String>> deleteFriend(@Query("usuarioId1") int usuarioId1, @Query("usuarioId2") int usuarioId2);
 
     // --- CURSOS Y CONTENIDO ---
     @GET("api/idiomas")
@@ -51,6 +68,6 @@ public interface ApiService {
     @GET("api/exercises")
     Call<List<Map<String, Object>>> exercises(@Query("testId") int testId);
 
-    @GET("api/ranking/global")
+    @GET("api/ranking")
     Call<List<Map<String, String>>> getRanking();
 }

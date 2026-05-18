@@ -1,6 +1,5 @@
 package com.example.demilingua;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -10,7 +9,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.demilingua.controller.ApiService;
 import com.example.demilingua.controller.RetrofitClient;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import retrofit2.Call;
@@ -49,26 +47,34 @@ public class AmigosActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Map<String, String>>> call, Response<List<Map<String, String>>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // Aquí usarías un Adapter similar al del Ranking
-                    // rvAmigos.setAdapter(new AmigosAdapter(response.body(), false));
+                    rvAmigos.setAdapter(new AmigosAdapter(response.body(), usuarioId, false));
                 }
             }
             @Override
-            public void onFailure(Call<List<Map<String, String>>> call, Throwable t) {}
+            public void onFailure(Call<List<Map<String, String>>> call, Throwable t) {
+                Toast.makeText(AmigosActivity.this, "Error al cargar amigos", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
     private void buscarUsuarios() {
-        String query = etBuscar.getText().toString();
+        String query = etBuscar.getText().toString().trim();
+        if (query.isEmpty()) {
+            cargarAmigos();
+            return;
+        }
+
         api.searchUsers(query).enqueue(new Callback<List<Map<String, String>>>() {
             @Override
             public void onResponse(Call<List<Map<String, String>>> call, Response<List<Map<String, String>>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // Mostrar resultados de búsqueda
+                    rvAmigos.setAdapter(new AmigosAdapter(response.body(), usuarioId, true));
                 }
             }
             @Override
-            public void onFailure(Call<List<Map<String, String>>> call, Throwable t) {}
+            public void onFailure(Call<List<Map<String, String>>> call, Throwable t) {
+                Toast.makeText(AmigosActivity.this, "Error en la búsqueda", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

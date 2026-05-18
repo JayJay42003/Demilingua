@@ -5,8 +5,8 @@ package com.example.demilingua.model;
  */
 public class Ejercicio {
     private int id;
-    private Integer puntuacion; // Usamos Integer para permitir null
-    private int testId;
+    private Integer puntos; // Usamos Integer para permitir null
+    private int test_id;
     private String tipo;
 
     // Constructores
@@ -14,10 +14,10 @@ public class Ejercicio {
         // Constructor vacío necesario para frameworks
     }
 
-    public Ejercicio(int id, Integer puntuacion, int testId, String tipo) {
+    public Ejercicio(int id, Integer puntos, int test_id, String tipo) {
         this.id = id;
-        this.puntuacion = puntuacion;
-        this.testId = testId;
+        this.puntos = puntos;
+        this.test_id = test_id;
         this.tipo = tipo;
     }
 
@@ -30,27 +30,27 @@ public class Ejercicio {
         this.id = id;
     }
 
-    public Integer getPuntuacion() {
-        return puntuacion;
+    public Integer getPuntos() {
+        return puntos;
     }
 
-    public void setPuntuacion(Integer puntuacion) {
+    public void setPuntos(Integer puntos) {
         // Validamos que si no es null, esté en un rango razonable
-        if (puntuacion != null && (puntuacion < 0 || puntuacion > 100)) {
+        if (puntos != null && (puntos < 0 || puntos > 100)) {
             throw new IllegalArgumentException("La puntuación debe estar entre 0 y 100");
         }
-        this.puntuacion = puntuacion;
+        this.puntos = puntos;
     }
 
-    public int getTestId() {
-        return testId;
+    public int getTest_id() {
+        return test_id;
     }
 
-    public void setTestId(int testId) {
-        if (testId <= 0) {
+    public void setTest_id(int test_id) {
+        if (test_id <= 0) {
             throw new IllegalArgumentException("El ID del test debe ser positivo");
         }
-        this.testId = testId;
+        this.test_id = test_id;
     }
 
     public String getTipo() {
@@ -69,8 +69,8 @@ public class Ejercicio {
     public String toString() {
         return "Ejercicio{" +
                 "id=" + id +
-                ", puntuacion=" + puntuacion +
-                ", testId=" + testId +
+                ", puntos=" + puntos +
+                ", test_id=" + test_id +
                 ", tipo='" + tipo + '\'' +
                 '}';
     }
@@ -83,7 +83,7 @@ public class Ejercicio {
         if (tipo == null || tipo.trim().isEmpty()) {
             throw new IllegalArgumentException("El tipo de ejercicio es requerido");
         }
-        if (testId <= 0) {
+        if (test_id <= 0) {
             throw new IllegalArgumentException("ID de test inválido");
         }
     }
@@ -95,9 +95,9 @@ public class Ejercicio {
      * @throws IllegalStateException Si la puntuación es null
      */
     public boolean estaAprobado(int puntuacionMinima) {
-        if (puntuacion == null) {
+        if (puntos == null) {
             throw new IllegalStateException("El ejercicio no tiene puntuación asignada");
         }
-        return puntuacion >= puntuacionMinima;
+        return puntos >= puntuacionMinima;
     }
 }

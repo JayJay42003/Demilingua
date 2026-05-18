@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.demilingua.model.Idioma;
 import java.util.List;
 
+import com.bumptech.glide.Glide;
+
 public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.ViewHolder> {
 
     private List<Idioma> languages;
@@ -34,19 +36,38 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        // Correcciones aplicadas aquí:
         Idioma idioma = languages.get(position);
         holder.tvName.setText(idioma.getName());
 
+        // --- LÓGICA DE CARGA DINÁMICA DE IMÁGENES ---
+        // 1. Intentar cargar desde una URL si el modelo la tuviera (ej: idioma.getIconUrl())
+        // 2. Como solución robusta, usamos un CDN de banderas basado en el nombre del idioma
+        
         String langName = idioma.getName().toLowerCase();
+        String flagUrl = "";
 
         if (langName.contains("inglés") || langName.contains("ingles")) {
-            holder.ivIcon.setImageResource(R.drawable.reino_unido);
+            flagUrl = "https://flagcdn.com/w160/gb.png";
         } else if (langName.contains("francés") || langName.contains("frances")) {
-            holder.ivIcon.setImageResource(R.drawable.francia);
+            flagUrl = "https://flagcdn.com/w160/fr.png";
         } else if (langName.contains("español") || langName.contains("espanol")) {
-            holder.ivIcon.setImageResource(R.drawable.espa_a);
+            flagUrl = "https://flagcdn.com/w160/es.png";
+        } else if (langName.contains("alemán") || langName.contains("aleman")) {
+            flagUrl = "https://flagcdn.com/w160/de.png";
+        } else if (langName.contains("italiano")) {
+            flagUrl = "https://flagcdn.com/w160/it.png";
+        } else if (langName.contains("portugués") || langName.contains("portugues")) {
+            flagUrl = "https://flagcdn.com/w160/pt.png";
+        }
+
+        if (!flagUrl.isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(flagUrl)
+                    .placeholder(R.drawable.logo)
+                    .error(R.drawable.logo)
+                    .into(holder.ivIcon);
         } else {
+            // Fallback a recurso local si no hay URL
             holder.ivIcon.setImageResource(R.drawable.logo);
         }
 

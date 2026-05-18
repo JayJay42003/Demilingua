@@ -26,9 +26,9 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.VH> {
     @Override public void onBindViewHolder(@NonNull VH h,int i){
         RankingItem item = data.get(i);
         h.tvPos.setText(String.valueOf(i+1));
-        h.tvUser.setText(item.getUsuario());
-        h.tvIdioma.setText(item.getIdioma());
-        h.tvPts.setText(String.valueOf(item.getPuntos()));
+        h.tvUser.setText(item.getNombre());
+        h.tvIdioma.setText(item.getDivision());
+        h.tvPuntos.setText(item.getRacha());
     }
     @Override public int getItemCount(){ return data.size(); }
 

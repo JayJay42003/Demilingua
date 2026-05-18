@@ -25,6 +25,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import android.view.View;
+import android.widget.ProgressBar;
+
 public class MainActivity extends AppCompatActivity implements LanguageAdapter.OnLanguageClickListener {
     private RecyclerView rvLanguages;
     private ImageButton btnProfile;
@@ -32,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements LanguageAdapter.O
 
     private TextView tvVidas, tvRacha;
     private ImageButton btnAmigos;
+    private ProgressBar pbRanking;
+    private SwipeRefreshLayout swipeRefresh;
     private final List<RankingItem> rankingList = new ArrayList<>();
 
     @Override
@@ -52,22 +58,22 @@ public class MainActivity extends AppCompatActivity implements LanguageAdapter.O
         tvVidas = findViewById(R.id.tvVidas);
         tvRacha = findViewById(R.id.tvRacha);
         btnAmigos = findViewById(R.id.btnAmigos);
+        pbRanking = findViewById(R.id.pbRanking);
+        swipeRefresh = findViewById(R.id.swipeRefresh);
 
         if (btnAmigos != null) {
             btnAmigos.setOnClickListener(v -> startActivity(new Intent(this, AmigosActivity.class)));
         }
 
+        if (swipeRefresh != null) {
+            swipeRefresh.setOnRefreshListener(this::refreshData);
+        }
+
         /*Idiomas*/
         rvLanguages = findViewById(R.id.rvLanguages);
         rvLanguages.setLayoutManager(new LinearLayoutManager(this));
-
-        List<Idioma> languages = new ArrayList<>();
-        languages.add(new Idioma(1, "Español", R.drawable.espa_a));
-        languages.add(new Idioma(2, "Ingles", R.drawable.reino_unido));
-        languages.add(new Idioma(3, "Frances", R.drawable.francia));
-
-        LanguageAdapter adapter = new LanguageAdapter(languages,this);
-        rvLanguages.setAdapter(adapter);
+        
+        cargarIdiomas();
 
         /*Ranking*/
         RecyclerView rvRank = findViewById(R.id.rvRanking);
@@ -75,26 +81,63 @@ public class MainActivity extends AppCompatActivity implements LanguageAdapter.O
         rankingAdapter = new RankingAdapter(rankingList);
         rvRank.setAdapter(rankingAdapter);
 
+        refreshData();
+    }
+
+    private void refreshData() {
+        cargarIdiomas();
         cargarRanking();
+        comprobarEstadoVidas();
+    }
+
+    private void cargarIdiomas() {
+        ApiService api = RetrofitClient.getApiService();
+        api.getIdiomas().enqueue(new Callback<List<Map<String, String>>>() {
+            @Override
+            public void onResponse(Call<List<Map<String, String>>> call, Response<List<Map<String, String>>> response) {
+                if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Idioma> languages = new ArrayList<>();
+                    for (Map<String, String> m : response.body()) {
+                        int id = Integer.parseInt(m.get("id"));
+                        String nombre = m.get("nombre");
+                        // El adaptador ya gestiona las banderas dinámicamente, pasamos 0 o logo
+                        languages.add(new Idioma(id, nombre, R.drawable.logo));
+                    }
+                    LanguageAdapter adapter = new LanguageAdapter(languages, MainActivity.this);
+                    rvLanguages.setAdapter(adapter);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Map<String, String>>> call, Throwable t) {
+                if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
+            }
+        });
     }
 
     private void cargarRanking() {
+        if (pbRanking != null) pbRanking.setVisibility(View.VISIBLE);
         ApiService api = RetrofitClient.getApiService();
         api.getRanking().enqueue(new Callback<>() {
             @Override public void onResponse(Call<List<Map<String,String>>> c,
                                              Response<List<Map<String,String>>> r) {
+                if (pbRanking != null) pbRanking.setVisibility(View.GONE);
+                if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
                 if (r.isSuccessful() && r.body()!=null) {
                     rankingList.clear();
                     for (Map<String,String> m : r.body()) {
                         rankingList.add(new RankingItem(
-                                m.get("usuario"),
-                                m.get("idioma"),
-                                Integer.parseInt(m.get("puntos"))));
+                                m.get("nombre"),
+                                m.get("racha"),
+                                m.get("division")));
                     }
                     rankingAdapter.notifyDataSetChanged();
                 }
             }
             @Override public void onFailure(Call<List<Map<String,String>>> c, Throwable t) {
+                if (pbRanking != null) pbRanking.setVisibility(View.GONE);
+                if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
                 Toast.makeText(MainActivity.this,
                         "No se pudo cargar el ranking", Toast.LENGTH_SHORT).show();
             }
@@ -103,12 +146,16 @@ public class MainActivity extends AppCompatActivity implements LanguageAdapter.O
 
     private void comprobarEstadoVidas() {
         int userId = getSharedPreferences("AppPrefs", MODE_PRIVATE).getInt("userId", -1);
-        if (userId == -1) return;
+        if (userId == -1) {
+            if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
+            return;
+        }
 
         ApiService api = RetrofitClient.getApiService();
         api.getStatusVidas(userId).enqueue(new Callback<Map<String, String>>() {
             @Override
             public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+                if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
                 if (response.isSuccessful() && response.body() != null) {
                     String vidas = response.body().get("vidas");
                     String racha = response.body().get("racha");
@@ -118,7 +165,9 @@ public class MainActivity extends AppCompatActivity implements LanguageAdapter.O
                 }
             }
             @Override
-            public void onFailure(Call<Map<String, String>> call, Throwable t) {}
+            public void onFailure(Call<Map<String, String>> call, Throwable t) {
+                if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
+            }
         });
     }
 

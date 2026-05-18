@@ -1,16 +1,16 @@
 package com.example.demilingua.model;
 
 public class RankingItem {
-    private final String usuario;
-    private final String idioma;
-    private final int puntos;
+    private final String nombre;
+    private final String racha;
+    private final String division;
 
-    public RankingItem(String usuario, String idioma, int puntos) {
-        this.usuario = usuario;
-        this.idioma  = idioma;
-        this.puntos  = puntos;
+    public RankingItem(String nombre, String racha, String division) {
+        this.nombre = nombre;
+        this.racha  = racha;
+        this.division  = division;
     }
-    public String getUsuario(){ return usuario; }
-    public String getIdioma() { return idioma; }
-    public int    getPuntos() { return puntos; }
+    public String getNombre(){ return nombre; }
+    public String getRacha() { return racha; }
+    public String getDivision() { return division; }
 }

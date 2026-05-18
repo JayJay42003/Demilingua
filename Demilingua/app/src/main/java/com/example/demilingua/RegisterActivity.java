@@ -147,7 +147,12 @@ public class RegisterActivity extends AppCompatActivity {
                                 .apply();
 
                         Toast.makeText(RegisterActivity.this, "Registro exitoso para: " + nombre, Toast.LENGTH_SHORT).show();
-                        finish(); // Regresar a Login
+                        
+                        // Ir a MainActivity directamente
+                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        finish(); 
                     } else {
                         String errorMsg = bodyMap.get("message") != null ?
                                 bodyMap.get("message") : "Error en el registro";

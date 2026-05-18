@@ -36,6 +36,7 @@ public class CourseActivity extends AppCompatActivity implements CourseAdapter.O
 
     private RecyclerView rvCursos;
     private TextView tvEmpty;
+    private ProgressBar pbCursos;
     private CourseAdapter adapter;
     private final List<Curso> cursoList = new ArrayList<>();
     private ApiService apiService;
@@ -60,8 +61,9 @@ public class CourseActivity extends AppCompatActivity implements CourseAdapter.O
         adapter  = new CourseAdapter(cursoList,this);
         rvCursos.setAdapter(adapter);
 
-        // Texto vacío
+        // Vistas de estado
         tvEmpty = findViewById(R.id.tvEmpty);
+        pbCursos = findViewById(R.id.pbCursos);
 
         // ───────────────────────── Retrofit ─────────────────────────
         apiService = RetrofitClient.getApiService();
@@ -70,12 +72,16 @@ public class CourseActivity extends AppCompatActivity implements CourseAdapter.O
     }
 
     private void cargarCursosPorIdioma(int idiomaId) {
+        if (pbCursos != null) pbCursos.setVisibility(View.VISIBLE);
+        if (tvEmpty != null) tvEmpty.setVisibility(View.GONE);
+
         Call<List<Map<String,String>>> call = apiService.course(idiomaId);
 
         call.enqueue(new Callback<>() {
             @Override
             public void onResponse(Call<List<Map<String,String>>> call,
                                    Response<List<Map<String,String>>> response) {
+                if (pbCursos != null) pbCursos.setVisibility(View.GONE);
 
                 if (response.isSuccessful() && response.body() != null) {
                     List<Map<String,String>> raw = response.body();
@@ -113,7 +119,8 @@ public class CourseActivity extends AppCompatActivity implements CourseAdapter.O
             @Override
             public void onFailure(@NonNull Call<List<Map<String,String>>> call,
                                   @NonNull Throwable t) {
-                Log.e("CursoActivity", "Fallo Retrofit", t);
+                if (pbCursos != null) pbCursos.setVisibility(View.GONE);
+                Log.e("CourseActivity", "Fallo Retrofit", t);
                 Toast.makeText(CourseActivity.this,
                         "Sin conexión: " + t.getMessage(),
                         Toast.LENGTH_LONG).show();
@@ -133,7 +140,7 @@ public class CourseActivity extends AppCompatActivity implements CourseAdapter.O
         Intent i = new Intent(this, TestActivity.class);
         i.putExtra("cursoId", curso.getId());
         i.putExtra("cursoName", curso.getNombre());
-        i.putExtra("idiomaId",curso.getIdiomaId());
+        i.putExtra("idiomaId",curso.getIdioma_id());
         startActivity(i);
     }
 }

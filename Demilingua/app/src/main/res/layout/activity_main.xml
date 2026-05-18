@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:background="@color/white">
+    android:background="@color/background_light">
 
 
     <!-- Toolbar -->
@@ -13,7 +13,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/purple_500">
+        android:background="@color/primary_purple">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -43,44 +43,69 @@
             android:background="?attr/selectableItemBackgroundBorderless"/>
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- Lista de Idiomas -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvLanguages"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"/>
+        android:layout_height="match_parent">
 
-    <View
-        android:id="@+id/divider1"
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
-        android:background="?android:attr/listDivider" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <!-- Ranking header -->
-    <TextView
-        android:id="@+id/tvRankingHeader"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/ranking"
-        android:layout_gravity="center"
-        android:textStyle="bold"
-        android:textColor="@color/red_500"
-        android:textSize="20sp"
-        android:layout_marginStart="16dp"
-        />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
-        android:background="?android:attr/listDivider" />
+                <!-- Lista de Idiomas -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvLanguages"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"/>
 
+                <View
+                    android:id="@+id/divider1"
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:background="?android:attr/listDivider" />
 
-    <!-- RecyclerView Ranking -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvRanking"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="16dp"/>
+                <!-- Ranking header -->
+                <TextView
+                    android:id="@+id/tvRankingHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ranking"
+                    android:layout_gravity="center"
+                    android:textStyle="bold"
+                    android:textColor="@color/red_500"
+                    android:textSize="20sp"
+                    android:layout_marginStart="16dp"
+                    />
+
+                <View
+                    android:id="@+id/divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:background="?android:attr/listDivider" />
+
+                <ProgressBar
+                    android:id="@+id/pbRanking"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:layout_margin="16dp"/>
+
+                <!-- RecyclerView Ranking -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvRanking"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="16dp"/>
+
+            </LinearLayout>
+        </ScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>
