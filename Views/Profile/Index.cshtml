@@ -101,12 +101,14 @@
             </div>
 
             <!-- Amigos -->
-            <div class="card shadow-sm mb-4" style="border-radius: 12px;">
-                <div class="card-body py-3 d-flex justify-content-between align-items-center">
-                    <span class="fw-bold"><i class="bi bi-people-fill me-1"></i>Amigos</span>
-                    <span class="badge bg-primary rounded-pill px-3">@Model.NumeroAmigos</span>
+            <a href="/Friends" class="text-decoration-none text-dark">
+                <div class="card shadow-sm mb-4 hover-card" style="border-radius: 12px; cursor: pointer;">
+                    <div class="card-body py-3 d-flex justify-content-between align-items-center">
+                        <span class="fw-bold"><i class="bi bi-people-fill me-1"></i>Amigos</span>
+                        <span class="badge bg-primary rounded-pill px-3">@Model.NumeroAmigos</span>
+                    </div>
                 </div>
-            </div>
+            </a>
 
             <!-- Progreso por idioma -->
             @if (Model.IdiomasProgreso.Any())

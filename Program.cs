@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
 
 // --- CRITICO: REGISTRAR EL SERVICIO DE API ---
 var backendBaseUrl = builder.Configuration["BackendBaseUrl"] ?? "http://localhost:8080";

@@ -31,17 +31,17 @@ namespace Demilingua.Controllers
             var items = new List<RankingItem>();
             var response = await _httpClient.GetAsync("/api/ranking");
             if (!response.IsSuccessStatusCode) return items;
-            
-            var json = await response.Content.ReadFromJsonAsync<List<Dictionary<string, string>>>();
+
+            var json = await response.Content.ReadFromJsonAsync<List<Dictionary<string, JsonElement>>>();
             if (json == null) return items;
-            
+
             foreach (var row in json)
             {
                 items.Add(new RankingItem
                 {
-                    Usuario = row.GetValueOrDefault("nombre") ?? string.Empty,
-                    Idioma = row.GetValueOrDefault("division") ?? string.Empty,
-                    Puntos = int.TryParse(row.GetValueOrDefault("racha"), out var p) ? p : 0
+                    Usuario = row.ContainsKey("nombre") ? row["nombre"].ToString() : string.Empty,
+                    Idioma = row.ContainsKey("division") ? row["division"].ToString() : string.Empty,
+                    Puntos = row.ContainsKey("racha") && int.TryParse(row["racha"].ToString(), out var p) ? p : 0
                 });
             }
             return items;
@@ -52,17 +52,17 @@ namespace Demilingua.Controllers
             var items = new List<RankingItem>();
             var response = await _httpClient.GetAsync($"/api/ranking/division/{divisionId}");
             if (!response.IsSuccessStatusCode) return items;
-            
-            var json = await response.Content.ReadFromJsonAsync<List<Dictionary<string, string>>>();
+
+            var json = await response.Content.ReadFromJsonAsync<List<Dictionary<string, JsonElement>>>();
             if (json == null) return items;
-            
+
             foreach (var row in json)
             {
                 items.Add(new RankingItem
                 {
-                    Usuario = row.GetValueOrDefault("nombre") ?? string.Empty,
+                    Usuario = row.ContainsKey("nombre") ? row["nombre"].ToString() : string.Empty,
                     Idioma = $"Division {divisionId}",
-                    Puntos = int.TryParse(row.GetValueOrDefault("racha"), out var p) ? p : 0
+                    Puntos = row.ContainsKey("racha") && int.TryParse(row["racha"].ToString(), out var p) ? p : 0
                 });
             }
             return items;
@@ -96,17 +96,14 @@ namespace Demilingua.Controllers
 
         public async Task<(string status, string? message)> RegisterAsync(string nombre, string correo, string password)
         {
-            var content = new FormUrlEncodedContent(new[]
-            {
-                new KeyValuePair<string, string>("nombre", nombre),
-                new KeyValuePair<string, string>("correo", correo),
-                new KeyValuePair<string, string>("contrasena", password)
-            });
-            var resp = await _httpClient.PostAsync("/api/users", content);
+            var payload = new { nombre = nombre, correo = correo, contrasena = password };
+            var resp = await _httpClient.PostAsJsonAsync("/api/users", payload);
+
             if (!resp.IsSuccessStatusCode) return ("error", "Error de conexin");
-            
-            var data = await resp.Content.ReadFromJsonAsync<Dictionary<string, string>>();
-            return (data?.GetValueOrDefault("status") ?? "error", data?.GetValueOrDefault("message"));
+
+            var data = await resp.Content.ReadFromJsonAsync<Dictionary<string, JsonElement>>();
+            return (data.ContainsKey("status") ? data["status"].ToString() : "error", 
+                    data.ContainsKey("message") ? data["message"].ToString() : null);
         }
 
         public async Task<string> UpdateUserAsync(int id, string nombre, string correo)
@@ -208,21 +205,40 @@ namespace Demilingua.Controllers
             var list = new List<EjercicioDto>();
             var resp = await _httpClient.GetAsync($"/api/tests/ejercicios/{testId}");
             if (!resp.IsSuccessStatusCode) return list;
-            var data = await resp.Content.ReadFromJsonAsync<List<Dictionary<string, object>>>();
-            if (data == null) return list;
-            foreach (var row in data)
+
+            var data = await resp.Content.ReadFromJsonAsync<JsonElement>();
+            if (data.ValueKind != JsonValueKind.Array) return list;
+
+            foreach (var row in data.EnumerateArray())
             {
-                var objetos = row.GetValueOrDefault("objetos") as List<object>;
-                var firstObj = objetos?.FirstOrDefault() as Dictionary<string, object>;
+                var ejercicioId = row.TryGetProperty("id", out var idProp) ? idProp.ToString() : string.Empty;
+                var tipo = row.TryGetProperty("tipo", out var tipoProp) ? tipoProp.GetString() ?? string.Empty : string.Empty;
+                var puntos = row.TryGetProperty("puntuacion", out var ptsProp) ? ptsProp.ToString() : "0";
+
+                string contenido = string.Empty;
+                string respuesta = string.Empty;
+                string opciones = null;
+
+                if (row.TryGetProperty("objetos", out var objetos) && objetos.ValueKind == JsonValueKind.Array)
+                {
+                    var enumerator = objetos.EnumerateArray();
+                    if (enumerator.MoveNext())
+                    {
+                        var firstObj = enumerator.Current;
+                        contenido = firstObj.TryGetProperty("contenido", out var cProp) ? cProp.GetString() ?? string.Empty : string.Empty;
+                        respuesta = firstObj.TryGetProperty("respuesta_correcta", out var rProp) ? rProp.GetString() ?? string.Empty : string.Empty;
+                        opciones = firstObj.TryGetProperty("opciones", out var oProp) && oProp.ValueKind != JsonValueKind.Null ? oProp.GetString() : null;
+                    }
+                }
 
                 list.Add(new EjercicioDto
                 {
-                    ejercicioId = row.GetValueOrDefault("id")?.ToString() ?? string.Empty,
-                    tipo = row.GetValueOrDefault("tipo")?.ToString() ?? string.Empty,
-                    puntos = row.GetValueOrDefault("puntuacion")?.ToString() ?? "0",
-                    contenido = firstObj?.GetValueOrDefault("contenido")?.ToString() ?? string.Empty,
-                    respuesta = firstObj?.GetValueOrDefault("respuesta_correcta")?.ToString() ?? string.Empty,
-                    opciones = firstObj?.GetValueOrDefault("opciones")?.ToString()
+                    ejercicioId = ejercicioId,
+                    tipo = tipo,
+                    puntos = puntos,
+                    contenido = contenido,
+                    respuesta = respuesta,
+                    opciones = opciones
                 });
             }
             return list;
@@ -256,26 +272,41 @@ namespace Demilingua.Controllers
             var list = new List<Dictionary<string, string>>();
             var resp = await _httpClient.GetAsync($"/api/friends/{usuarioId}");
             if (!resp.IsSuccessStatusCode) return list;
-            var data = await resp.Content.ReadFromJsonAsync<List<Dictionary<string, string>>>();
-            return data ?? list;
+            var data = await resp.Content.ReadFromJsonAsync<List<Dictionary<string, JsonElement>>>();
+            if (data != null) {
+                foreach (var d in data) list.Add(d.ToDictionary(k => k.Key, k => k.Value.ToString()));
+            }
+            return list;
         }
 
         public async Task<bool> AddFriendAsync(int usuarioId1, int usuarioId2)
         {
-            var url = $"/api/friends?usuarioId1={usuarioId1}&usuarioId2={usuarioId2}";
-            var resp = await _httpClient.PostAsync(url, null);
-            if (!resp.IsSuccessStatusCode) return false;
-            var data = await resp.Content.ReadFromJsonAsync<Dictionary<string, string>>();
-            return string.Equals(data?.GetValueOrDefault("status"), "ok", StringComparison.OrdinalIgnoreCase);
+            var payload = new { usuarioId1 = usuarioId1, usuarioId2 = usuarioId2 };
+            var resp = await _httpClient.PostAsJsonAsync("/api/friends", payload);
+            if (!resp.IsSuccessStatusCode)
+            {
+                var url = $"/api/friends?usuarioId1={usuarioId1}&usuarioId2={usuarioId2}";
+                resp = await _httpClient.PostAsync(url, null);
+                if (!resp.IsSuccessStatusCode) return false;
+            }
+
+            var data = await resp.Content.ReadFromJsonAsync<Dictionary<string, JsonElement>>();
+            return data != null && data.ContainsKey("status") && string.Equals(data["status"].ToString(), "ok", StringComparison.OrdinalIgnoreCase);
         }
 
         public async Task<bool> AcceptFriendAsync(int usuarioId1, int usuarioId2)
         {
-            var url = $"/api/friends?usuarioId1={usuarioId1}&usuarioId2={usuarioId2}";
-            var resp = await _httpClient.PutAsync(url, null);
-            if (!resp.IsSuccessStatusCode) return false;
-            var data = await resp.Content.ReadFromJsonAsync<Dictionary<string, string>>();
-            return string.Equals(data?.GetValueOrDefault("status"), "ok", StringComparison.OrdinalIgnoreCase);
+            var payload = new { usuarioId1 = usuarioId1, usuarioId2 = usuarioId2 };
+            var resp = await _httpClient.PutAsJsonAsync("/api/friends", payload);
+            if (!resp.IsSuccessStatusCode)
+            {
+                var url = $"/api/friends?usuarioId1={usuarioId1}&usuarioId2={usuarioId2}";
+                resp = await _httpClient.PutAsync(url, null);
+                if (!resp.IsSuccessStatusCode) return false;
+            }
+
+            var data = await resp.Content.ReadFromJsonAsync<Dictionary<string, JsonElement>>();
+            return data != null && data.ContainsKey("status") && string.Equals(data["status"].ToString(), "ok", StringComparison.OrdinalIgnoreCase);
         }
 
         public async Task<bool> DeleteFriendAsync(int usuarioId1, int usuarioId2)
@@ -283,8 +314,8 @@ namespace Demilingua.Controllers
             var url = $"/api/friends?usuarioId1={usuarioId1}&usuarioId2={usuarioId2}";
             var resp = await _httpClient.DeleteAsync(url);
             if (!resp.IsSuccessStatusCode) return false;
-            var data = await resp.Content.ReadFromJsonAsync<Dictionary<string, string>>();
-            return string.Equals(data?.GetValueOrDefault("status"), "ok", StringComparison.OrdinalIgnoreCase);
+            var data = await resp.Content.ReadFromJsonAsync<Dictionary<string, JsonElement>>();
+            return data != null && data.ContainsKey("status") && string.Equals(data["status"].ToString(), "ok", StringComparison.OrdinalIgnoreCase);
         }
 
         public async Task<List<Dictionary<string, string>>> GetAllUsersAsync()
@@ -292,8 +323,11 @@ namespace Demilingua.Controllers
             var list = new List<Dictionary<string, string>>();
             var resp = await _httpClient.GetAsync("/api/users");
             if (!resp.IsSuccessStatusCode) return list;
-            var data = await resp.Content.ReadFromJsonAsync<List<Dictionary<string, string>>>();
-            return data ?? list;
+            var data = await resp.Content.ReadFromJsonAsync<List<Dictionary<string, JsonElement>>>();
+            if (data != null) {
+                foreach (var d in data) list.Add(d.ToDictionary(k => k.Key, k => k.Value.ToString()));
+            }
+            return list;
         }
 
         public async Task<bool> DeleteUserAsync(int id)
@@ -309,8 +343,11 @@ namespace Demilingua.Controllers
             var list = new List<Dictionary<string, string>>();
             var resp = await _httpClient.GetAsync($"/api/progress/{usuarioId}");
             if (!resp.IsSuccessStatusCode) return list;
-            var data = await resp.Content.ReadFromJsonAsync<List<Dictionary<string, string>>>();
-            return data ?? list;
+            var data = await resp.Content.ReadFromJsonAsync<List<Dictionary<string, JsonElement>>>();
+            if (data != null) {
+                foreach (var d in data) list.Add(d.ToDictionary(k => k.Key, k => k.Value.ToString()));
+            }
+            return list;
         }
 
         // --- CRUD Idiomas ---

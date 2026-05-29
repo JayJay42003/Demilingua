@@ -51,7 +51,7 @@
                                 }
                             </div>
                             <div class="d-flex gap-1">
-                                @if (isPendiente)
+                                @if (isPendiente && friend.GetValueOrDefault("can_accept") == "true")
                                 {
                                     <form method="post" asp-action="AcceptFriend">
                                         <input type="hidden" name="amigoId" value="@amigoId" />
