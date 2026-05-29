@@ -1,54 +1,96 @@
-@model List<Demilingua.Models.Curso>
+@model Demilingua.Models.CoursePathViewModel
 @{
     ViewData["Title"] = "Cursos";
 }
 
 <div class="container mt-4">
-    <!-- Toolbar (replicando toolbar de activity_course.xml) -->
+    <!-- Toolbar -->
     <div class="d-flex align-items-center mb-4 p-3 bg-dark text-white rounded">
         <a asp-controller="Home" asp-action="Index" class="text-white me-3"><i class="bi bi-arrow-left fs-4"></i></a>
-        <h4 class="m-0">Cursos de @ViewBag.IdiomaNombre</h4>
+        <h4 class="m-0">Cursos de @Model.IdiomaNombre</h4>
     </div>
 
-    @if (Model == null || !Model.Any())
+    @if (ViewBag.SinVidas != null && (bool)ViewBag.SinVidas)
     {
-        <!-- Mensaje Empty (tvEmpty) -->
-        <div class="alert alert-info text-center p-5">
-            <h4>No hay cursos disponibles para este idioma.</h4>
-            <p>Intenta con otro idioma o vuelve más tarde.</p>
+        <div class="alert alert-danger text-center p-4 border-0" style="border-radius:16px;background:#fff5f5;">
+            <i class="bi bi-heartbreak display-3 d-block mb-2"></i>
+            <h4>Te has quedado sin vidas</h4>
+            <p class="mb-1">No puedes acceder a los cursos hasta que tus vidas se recarguen.</p>
+            <p class="text-muted small">Las vidas se recargan automaticamente cada dia a las 00:00.</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-danger mt-2">Volver al inicio</a>
         </div>
     }
     else
     {
-        <!-- RecyclerView (rvModulos) simulado con Grid de Bootstrap -->
-        <div class="row g-4">
-            @foreach (var curso in Model)
+
+    @if (Model == null || Model.Items == null || !Model.Items.Any())
+    {
+        <!-- Mensaje Empty -->
+        <div class="alert alert-info text-center p-5 border-0" style="border-radius:16px;background:#f0f4ff;">
+            <i class="bi bi-journal-x display-4 d-block mb-2 text-purple"></i>
+            <h4>No hay cursos disponibles para este idioma.</h4>
+            <p class="mb-0">Intenta con otro idioma o vuelve mas tarde.</p>
+        </div>
+    }
+    else
+    {
+        <div class="course-path">
+            @for (int i = 0; i < Model.Items.Count; i++)
             {
-                <div class="col-md-6 col-lg-4">
-                    <!-- Replica course_item.xml -->
-                    <a asp-controller="Test" asp-action="Index" 
-                       asp-route-cursoId="@curso.Id" 
-                       asp-route-idiomaId="@ViewBag.IdiomaId"
-                       class="text-decoration-none text-dark">
-                       
-                        <div class="card h-100 shadow-sm course-card hover-effect">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title fw-bold text-primary">@curso.Nombre</h5>
-                                <p class="card-text text-muted flex-grow-1">@curso.Descripcion</p>
-                                
-                                <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
-                                    <span class="badge bg-info text-dark">Nivel: @curso.Dificultad</span>
-                                    <span class="text-primary"><i class="bi bi-play-circle-fill fs-4"></i></span>
+                var item = Model.Items[i];
+                var curso = item.Curso;
+                var isLast = i == Model.Items.Count - 1;
+                var statusClass = item.IsCompleted ? "course-node done" : (item.IsUnlocked ? "course-node active" : "course-node locked");
+                <div class="course-row">
+                    <div class="course-line">
+                        @if (!isLast)
+                        {
+                            <div class="line"></div>
+                        }
+                    </div>
+                    <div class="course-card-wrap">
+                        @if (item.IsUnlocked)
+                        {
+                            <a asp-controller="Test" asp-action="Index"
+                               asp-route-cursoId="@curso.Id"
+                               asp-route-idiomaId="@Model.IdiomaId"
+                               class="text-decoration-none text-dark">
+                                <div class="@statusClass">
+                                    <div class="node-icon">
+                                        @if (item.IsCompleted)
+                                        {
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-play-fill"></i>
+                                        }
+                                    </div>
+                                    <div class="node-content">
+                                        <h5 class="m-0">@curso.Nombre</h5>
+                                        <p class="text-muted small mb-2">@curso.Descripcion</p>
+                                        <span class="badge bg-info text-dark">Nivel: @curso.Dificultad</span>
+                                    </div>
+                                </div>
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="@statusClass">
+                                <div class="node-icon">
+                                    <i class="bi bi-lock-fill"></i>
+                                </div>
+                                <div class="node-content">
+                                    <h5 class="m-0">@curso.Nombre</h5>
+                                    <p class="text-muted small mb-2">@curso.Descripcion</p>
+                                    <span class="badge bg-secondary">Bloqueado</span>
                                 </div>
                             </div>
-                        </div>
-                    </a>
+                        }
+                    </div>
                 </div>
             }
         </div>
     }
+    }
 </div>
-
-<style>
-    .hover-effect:hover { transform: scale(1.02); transition: 0.2s; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15)!important; }
-</style>

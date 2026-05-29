@@ -15,10 +15,18 @@ namespace Demilingua.Controllers
             _apiService = apiService;
         }
 
-        // 1. Carga la vista vacía con los datos de sesión necesarios
-        public IActionResult Index(int cursoId, int idiomaId)
+        // 1. Carga la vista vacia con los datos de sesion necesarios
+        public async Task<IActionResult> Index(int cursoId, int idiomaId)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+
+            // Verificar vidas antes de permitir el test
+            var profile = await _apiService.GetUserProfileAsync(userId);
+            if (profile != null && profile.Vidas <= 0)
+            {
+                TempData["Error"] = "Te has quedado sin vidas. Espera a que se recarguen.";
+                return RedirectToAction("Index", "Courses", new { idiomaId });
+            }
             
             var model = new TestSessionViewModel
             {
@@ -43,7 +51,7 @@ namespace Demilingua.Controllers
         public async Task<IActionResult> GetExercises(int testId)
         {
             // Llama a Java: /api/exercises?testId=...
-            // Este método debes agregarlo a ApiService si no lo pusiste antes
+            // Este mï¿½todo debes agregarlo a ApiService si no lo pusiste antes
             // Retorna la lista de ejercicios (Map<String, String>)
             var ejercicios = await _apiService.GetExercisesAsync(testId);
             return Json(ejercicios);
@@ -57,7 +65,35 @@ namespace Demilingua.Controllers
             return Json(new { success = success });
         }
 
-        // DTO pequeño para recibir el POST de puntos
+        [HttpPost]
+        public async Task<IActionResult> CompleteTest(int usuarioId, int testId, int puntuacion)
+        {
+            var ok = await _apiService.CompleteTestAsync(usuarioId, testId, puntuacion);
+            return Json(new { success = ok });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubtractLife(int usuarioId)
+        {
+            var ok = await _apiService.SubtractLifeAsync(usuarioId);
+            return Json(new { success = ok });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateStreak(int usuarioId, int xp)
+        {
+            var ok = await _apiService.UpdateStreakAsync(usuarioId, xp);
+            return Json(new { success = ok });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EvaluateLeague(int usuarioId)
+        {
+            var divisionId = await _apiService.EvaluateLeagueAsync(usuarioId);
+            return Json(new { divisionId = divisionId ?? string.Empty });
+        }
+
+        // DTO pequeï¿½o para recibir el POST de puntos
         public class PuntosSubmission
         {
             public int UsuarioId { get; set; }

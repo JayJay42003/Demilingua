@@ -1,0 +1,25 @@
+@model Demilingua.Models.UserHudViewModel
+
+@{
+    var divisionColor = Model.DivisionId switch
+    {
+        1 => "#cd7f32",
+        2 => "#c0c0c0",
+        3 => "#ffd700",
+        4 => "#e5e4e2",
+        5 => "#b9f2ff",
+        _ => "#6c757d"
+    };
+}
+
+<div class="d-flex align-items-center gap-3">
+    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
+        <i class="bi bi-heart-fill me-1"></i>@Model.Vidas
+    </span>
+    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2">
+        <i class="bi bi-fire me-1"></i>@Model.RachaActual
+    </span>
+    <span class="badge px-3 py-2 text-white" style="background-color:@divisionColor">
+        <i class="bi bi-trophy-fill me-1"></i>@Model.DivisionNombre
+    </span>
+</div>

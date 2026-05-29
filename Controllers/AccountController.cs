@@ -39,7 +39,7 @@ namespace Demilingua.Controllers
             var result = await _apiService.LoginAsync(model.Correo, model.Password);
             if (result.status == "ok")
             {
-                // 2. Crear los datos de la sesión (Claims)
+                // 2. Crear los datos de la sesiï¿½n (Claims)
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier, result.user_id ?? ""),
@@ -47,9 +47,19 @@ namespace Demilingua.Controllers
                     new Claim(ClaimTypes.Email, model.Correo)
                 };
 
+                if (!string.IsNullOrEmpty(result.token))
+                {
+                    claims.Add(new Claim("Token", result.token));
+                }
+
+                if (model.Correo == "admin@demilingua.com")
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+                }
+
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var principal = new ClaimsPrincipal(identity);
-                // 3. Iniciar sesión en la cookie
+                // 3. Iniciar sesiï¿½n en la cookie
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
@@ -60,7 +70,7 @@ namespace Demilingua.Controllers
             }
 
             // Si falla, mostramos error
-            ViewBag.Error = result.message ?? "Credenciales inválidas";
+            ViewBag.Error = result.message ?? "Credenciales invï¿½lidas";
             return View(model);
         }
 
@@ -70,6 +80,34 @@ namespace Demilingua.Controllers
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Account");
+        }
+
+        // GET: Muestra formulario de registro
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Register()
+        {
+            return View(new RegisterViewModel());
+        }
+
+        // POST: Procesa el registro
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var result = await _apiService.RegisterAsync(model.Nombre, model.Correo, model.Password);
+            if (result.status == "ok")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            ViewBag.Error = result.message ?? "No se pudo registrar";
+            return View(model);
         }
     }
 }

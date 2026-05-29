@@ -5,6 +5,7 @@ namespace Demilingua.Models
     {
         public List<Idioma> Idiomas { get; set; }
         public List<RankingItem> Ranking { get; set; }
+        public List<DivisionItem> Divisiones { get; set; }
     }
 
     // Replica LanguageAdapter.java
@@ -12,7 +13,7 @@ namespace Demilingua.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string FlagCode { get; set; } // Para usar con librería de banderas css
+        public string FlagCode { get; set; } // Para usar con librerï¿½a de banderas css
     }
     
     // Replica RankingItem.java
@@ -23,7 +24,30 @@ namespace Demilingua.Models
         public int Puntos { get; set; }
     }
 
-    // Histórico de puntuaciones
+    public class DivisionItem
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; }
+        public int XpMinimo { get; set; }
+    }
+
+    public class IdiomaProgresoItem
+    {
+        public string IdiomaNombre { get; set; }
+        public int Puntos { get; set; }
+        public int IdiomaId { get; set; }
+        public int PorcentajeDelTotal { get; set; }
+    }
+
+    public class LogroItem
+    {
+        public string Nombre { get; set; }
+        public string Icono { get; set; }
+        public string Descripcion { get; set; }
+        public bool Desbloqueado { get; set; }
+    }
+
+    // Histï¿½rico de puntuaciones
     public class PuntuacionItem
     {
         public int UsuarioId { get; set; }

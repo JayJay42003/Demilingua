@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Demilingua.Models;
+using System.Security.Claims;
 
 namespace Demilingua.Controllers
 {
@@ -14,16 +15,40 @@ namespace Demilingua.Controllers
             _apiService = apiService;
         }
 
-        // GET: /Courses?idiomaId=1&nombre=Español
+        // GET: /Courses?idiomaId=1&nombre=Ingles
         public async Task<IActionResult> Index(int idiomaId, string nombre)
         {
-            ViewBag.IdiomaNombre = nombre ?? "Idioma";
-            ViewBag.IdiomaId = idiomaId;
+            var idiomaNombre = string.IsNullOrWhiteSpace(nombre) ? "Idioma" : nombre;
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
 
-            // Llama a endpoint /api/courses?idiomaId=X
+            // Verificar vidas del usuario
+            var profile = await _apiService.GetUserProfileAsync(userId);
+            var vidas = profile?.Vidas ?? 5;
+            ViewBag.Vidas = vidas;
+            ViewBag.SinVidas = vidas <= 0;
+
             var cursos = await _apiService.GetCursosAsync(idiomaId);
-            
-            return View(cursos);
+
+            var items = new List<CoursePathItem>();
+            foreach (var curso in cursos)
+            {
+                items.Add(new CoursePathItem
+                {
+                    Curso = curso,
+                    TestId = 0,
+                    IsCompleted = false,
+                    IsUnlocked = vidas > 0 // Bloquear si no tiene vidas
+                });
+            }
+
+            var model = new CoursePathViewModel
+            {
+                IdiomaId = idiomaId,
+                IdiomaNombre = idiomaNombre,
+                Items = items
+            };
+
+            return View(model);
         }
     }
 }

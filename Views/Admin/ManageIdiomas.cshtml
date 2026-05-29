@@ -1,0 +1,81 @@
+@model List<Demilingua.Models.Idioma>
+@{
+    ViewData["Title"] = "Gestionar Idiomas";
+}
+
+<div class="container mt-4">
+    <h2><i class="bi bi-translate me-2"></i>Gestionar Idiomas</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm mb-3"><i class="bi bi-arrow-left"></i> Volver</a>
+
+    <div class="card shadow-sm mb-4" style="border-radius: 12px;">
+        <div class="card-header bg-white fw-bold">Anadir Idioma</div>
+        <div class="card-body">
+            <form method="post" asp-action="CreateIdioma" class="row g-2 align-items-end">
+                <div class="col-md-8">
+                    <input type="text" name="nombre" class="form-control" placeholder="Nombre del idioma..." required />
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100">Crear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="3" class="text-center py-4 text-muted">
+                        <i class="bi bi-translate display-4 d-block mb-2"></i>
+                        Ningun idioma creado. Usa el formulario superior.
+                    </td></tr>
+                }
+                @foreach (var idioma in Model)
+                {
+                    <tr>
+                        <td>@idioma.Id</td>
+                        <td>
+                            <span id="nombre-@idioma.Id">@idioma.Name</span>
+                            <form method="post" asp-action="UpdateIdioma" class="d-none" id="form-@idioma.Id">
+                                <input type="hidden" name="id" value="@idioma.Id" />
+                                <div class="input-group input-group-sm">
+                                    <input type="text" name="nombre" value="@idioma.Name" class="form-control" required />
+                                    <button type="submit" class="btn btn-success"><i class="bi bi-check-lg"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary" onclick="cancelEdit(@idioma.Id)"><i class="bi bi-x-lg"></i></button>
+                                </div>
+                            </form>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editIdioma(@idioma.Id)"><i class="bi bi-pencil"></i></button>
+                            <form method="post" asp-action="DeleteIdioma" class="d-inline" onsubmit="return confirm('Eliminar @idioma.Name?')">
+                                <input type="hidden" name="id" value="@idioma.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function editIdioma(id) {
+        document.getElementById('nombre-' + id).classList.add('d-none');
+        document.getElementById('form-' + id).classList.remove('d-none');
+    }
+    function cancelEdit(id) {
+        document.getElementById('nombre-' + id).classList.remove('d-none');
+        document.getElementById('form-' + id).classList.add('d-none');
+    }
+</script>
+}
