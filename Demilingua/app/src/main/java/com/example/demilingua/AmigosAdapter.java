@@ -8,8 +8,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.demilingua.controller.ApiService;
-import com.example.demilingua.controller.RetrofitClient;
+import com.example.demilingua.model.Amistad;
+import com.example.demilingua.model.GenericResponse;
+
 import java.util.List;
 import java.util.Map;
 import retrofit2.Call;
@@ -18,14 +21,16 @@ import retrofit2.Response;
 
 public class AmigosAdapter extends RecyclerView.Adapter<AmigosAdapter.ViewHolder> {
 
-    private List<Map<String, String>> amigosList;
+    private List<Amistad> amigosList;
     private int usuarioId;
     private boolean esBusqueda;
+    private ApiService api;
 
-    public AmigosAdapter(List<Map<String, String>> amigosList, int usuarioId, boolean esBusqueda) {
+    public AmigosAdapter(List<Amistad> amigosList, int usuarioId, boolean esBusqueda, ApiService api) {
         this.amigosList = amigosList;
         this.usuarioId = usuarioId;
         this.esBusqueda = esBusqueda;
+        this.api = api;
     }
 
     @NonNull
@@ -37,49 +42,50 @@ public class AmigosAdapter extends RecyclerView.Adapter<AmigosAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Map<String, String> item = amigosList.get(position);
-        ApiService api = RetrofitClient.getApiService();
+        Amistad item = amigosList.get(holder.getAdapterPosition());
 
         if (esBusqueda) {
-            String nombre = item.get("nombre");
-            int amigoId = Integer.parseInt(item.get("id"));
-            holder.tvAmigoId.setText(nombre);
-            holder.tvAmigoEstado.setText("ID: " + amigoId);
+            holder.tvAmigoId.setText(item.getNombre());
+            holder.tvAmigoEstado.setText("Puntos: " + item.getPuntos());
             holder.btnAccept.setVisibility(View.VISIBLE);
             holder.btnAccept.setImageResource(android.R.drawable.ic_input_add);
             holder.btnDelete.setVisibility(View.GONE);
 
             holder.btnAccept.setOnClickListener(v -> {
-                api.sendFriendRequest(usuarioId, amigoId).enqueue(new Callback<Map<String, String>>() {
+                api.sendFriendRequest(usuarioId, item.getAmigoId()).enqueue(new Callback<GenericResponse>() {
                     @Override
-                    public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+                    public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
                         if (response.isSuccessful()) {
                             Toast.makeText(holder.itemView.getContext(), "Solicitud enviada", Toast.LENGTH_SHORT).show();
+                            holder.btnAccept.setVisibility(View.GONE);
                         }
                     }
                     @Override
-                    public void onFailure(Call<Map<String, String>> call, Throwable t) {}
+                    public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
+                        Toast.makeText(holder.itemView.getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+                    }
                 });
             });
         } else {
-            int amigoId = Integer.parseInt(item.get("amigo_id"));
-            String estado = item.get("estado");
-            holder.tvAmigoId.setText("Amigo ID: " + amigoId);
-            holder.tvAmigoEstado.setText("Estado: " + estado);
+            String displayName = item.getNombre() != null ? item.getNombre() : "Usuario #" + item.getAmigoId();
+            holder.tvAmigoId.setText(displayName);
+            holder.tvAmigoEstado.setText("Puntos: " + item.getPuntos() + " (" + item.getEstado() + ")");
+            holder.btnDelete.setVisibility(View.VISIBLE);
 
-            if ("PENDIENTE".equals(estado)) {
+            if ("PENDIENTE".equals(item.getEstado())) {
                 holder.btnAccept.setVisibility(View.VISIBLE);
+                holder.btnAccept.setImageResource(android.R.drawable.ic_menu_save);
                 holder.btnAccept.setOnClickListener(v -> {
-                    api.acceptFriend(usuarioId, amigoId).enqueue(new Callback<Map<String, String>>() {
+                    api.acceptFriend(usuarioId, item.getAmigoId()).enqueue(new Callback<GenericResponse>() {
                         @Override
-                        public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+                        public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
                             if (response.isSuccessful()) {
-                                item.put("estado", "ACEPTADO");
-                                notifyItemChanged(position);
+                                item.setEstado("ACEPTADO");
+                                notifyItemChanged(holder.getAdapterPosition());
                             }
                         }
                         @Override
-                        public void onFailure(Call<Map<String, String>> call, Throwable t) {}
+                        public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {}
                     });
                 });
             } else {
@@ -87,16 +93,17 @@ public class AmigosAdapter extends RecyclerView.Adapter<AmigosAdapter.ViewHolder
             }
 
             holder.btnDelete.setOnClickListener(v -> {
-                api.deleteFriend(usuarioId, amigoId).enqueue(new Callback<Map<String, String>>() {
+                int currentPos = holder.getAdapterPosition();
+                api.deleteFriend(usuarioId, item.getAmigoId()).enqueue(new Callback<GenericResponse>() {
                     @Override
-                    public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+                    public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
                         if (response.isSuccessful()) {
-                            amigosList.remove(position);
-                            notifyItemRemoved(position);
+                            amigosList.remove(currentPos);
+                            notifyItemRemoved(currentPos);
                         }
                     }
                     @Override
-                    public void onFailure(Call<Map<String, String>> call, Throwable t) {}
+                    public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {}
                 });
             });
         }

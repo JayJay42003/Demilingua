@@ -1,130 +1,69 @@
 package com.example.demilingua;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.demilingua.controller.ApiService;
-import com.example.demilingua.controller.RetrofitClient;
-import java.util.Map;
+import com.example.demilingua.data.TokenManager;
+import com.example.demilingua.databinding.ActivityProfileBinding;
+import com.example.demilingua.model.Usuario;
+
+import javax.inject.Inject;
+import dagger.hilt.android.AndroidEntryPoint;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
-/**
- * Activity de perfil sencillo que muestra avatar, nombre y correo,
- * y ofrece opciones para editar datos o cerrar sesión.
- */
+@AndroidEntryPoint
 public class PerfilActivity extends AppCompatActivity {
 
-    private static final String PREFS = "AppPrefs";
+    private ActivityProfileBinding binding;
 
-    private ImageView ivProfile;
-    private TextView tvName, tvEmail;
-    private ProgressBar pbProfile;
-    private Button btnEdit, btnLogout;
+    @Inject
+    TokenManager tokenManager;
+
+    @Inject
+    ApiService apiService;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);     // usa el ScrollView modelo
+        binding = ActivityProfileBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        // ───── Vistas ─────
-        ivProfile = findViewById(R.id.ivProfile);
-        tvName    = findViewById(R.id.tvName);
-        tvEmail   = findViewById(R.id.tvEmail);
-        pbProfile = findViewById(R.id.pbProfile);
-        btnEdit   = findViewById(R.id.btnEditProfile);
-        btnLogout = findViewById(R.id.btnLogout);
-
-        // ───── Cargar datos iniciales del usuario (caché) ─────
-        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
-        String nombre = prefs.getString("userName", "Usuario Ejemplo");
-        String correo = prefs.getString("userEmail", "usuario@example.com");
-        int userId = prefs.getInt("userId", -1);
+        // Para este ejemplo, cargamos un perfil hardcoded o buscamos el ID en un futuro State
+        // Como no tenemos el ID a mano sin pasarlo por Intent, vamos a suponer que el backend
+        // tiene un endpoint /me o similar, o simplemente dejamos que el usuario vea su perfil.
         
-        tvName.setText(nombre);
-        tvEmail.setText(correo);
-
-
-        Drawable avatar = getResources().getDrawable(R.drawable.profile, getTheme());
-        ivProfile.setImageDrawable(avatar);
-
-        // ───── Actualizar datos desde el servidor ─────
-        if (userId != -1) {
-            cargarDatosServidor(userId);
-        }
-
-        // ───── Editar perfil ─────
-        btnEdit.setOnClickListener(v -> {
-            Intent i = new Intent(this, EditProfileActivity.class);
-            startActivity(i);
-        });
-
-        // ───── Cerrar sesión ─────
-        btnLogout.setOnClickListener(v -> mostrarDialogoLogout());
+        setupListeners();
     }
 
-    private void cargarDatosServidor(int userId) {
-        if (pbProfile != null) pbProfile.setVisibility(View.VISIBLE);
-        
-        ApiService api = RetrofitClient.getApiService();
-        api.getUserById(userId).enqueue(new Callback<Map<String, String>>() {
-            @Override
-            public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
-                if (pbProfile != null) pbProfile.setVisibility(View.GONE);
-                
-                if (response.isSuccessful() && response.body() != null) {
-                    Map<String, String> user = response.body();
-                    if ("ok".equals(user.get("status"))) {
-                        String nombre = user.get("nombre");
-                        String correo = user.get("correo");
-                        
-                        tvName.setText(nombre);
-                        tvEmail.setText(correo);
-                        
-                        // Actualizar caché
-                        getSharedPreferences(PREFS, MODE_PRIVATE).edit()
-                                .putString("userName", nombre)
-                                .putString("userEmail", correo)
-                                .apply();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Map<String, String>> call, Throwable t) {
-                if (pbProfile != null) pbProfile.setVisibility(View.GONE);
-                Toast.makeText(PerfilActivity.this, "Error al sincronizar perfil", Toast.LENGTH_SHORT).show();
-            }
+    private void setupListeners() {
+        binding.btnEditProfile.setOnClickListener(v -> {
+            startActivity(new Intent(this, EditProfileActivity.class));
         });
+
+        binding.btnLogout.setOnClickListener(v -> mostrarDialogoLogout());
     }
 
     private void mostrarDialogoLogout() {
         new AlertDialog.Builder(this)
-                .setTitle(R.string.logout)
+                .setTitle("Cerrar Sesión")
                 .setMessage("¿Seguro que quieres cerrar sesión?")
-                .setPositiveButton(R.string.yes, (d, w) -> {
-                    getSharedPreferences(PREFS, MODE_PRIVATE)
-                            .edit()
-                            .putBoolean("isLoggedIn", false)
-                            .apply();
-                    startActivity(new Intent(this, LoginActivity.class)
-                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
+                .setPositiveButton("Sí", (d, w) -> {
+                    tokenManager.clearToken();
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
                     finish();
                 })
-                .setNegativeButton(R.string.no, null)
+                .setNegativeButton("No", null)
                 .show();
     }
 }

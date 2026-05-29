@@ -1,145 +1,67 @@
 package com.example.demilingua;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Patterns;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.example.demilingua.controller.ApiService;
-import com.example.demilingua.controller.LoginResponse;
-import com.example.demilingua.controller.RetrofitClient;
+import com.example.demilingua.databinding.ActivityLoginBinding;
+import com.example.demilingua.ui.auth.AuthViewModel;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import dagger.hilt.android.AndroidEntryPoint;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
+@AndroidEntryPoint
 public class LoginActivity extends AppCompatActivity {
-
-    private EditText etEmail, etPassword;
-    private Button btnLogin;
-    private TextView tvRegister;
+    private ActivityLoginBinding binding;
+    private AuthViewModel viewModel;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        // Inicializar vistas
-        etEmail = findViewById(R.id.etEmail);
-        etPassword = findViewById(R.id.etPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        tvRegister = findViewById(R.id.tvRegister);
+        viewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
-        // Click en Registro
-        tvRegister.setOnClickListener(v -> {
-            startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
-        });
-
-        // Click en Login
-        btnLogin.setOnClickListener(v -> {
-            String email = etEmail.getText().toString().trim();
-            String password = etPassword.getText().toString().trim();
-
-            if (validarCampos(email, password)) {
-                realizarLogin(email, password);
-            }
-        });
-
-
+        setupListeners();
+        observeViewModel();
     }
 
-    private boolean validarCampos(String email, String password) {
-        boolean valido = true;
+    private void setupListeners() {
+        binding.btnLogin.setOnClickListener(v -> {
+            String email = binding.etEmail.getText().toString().trim();
+            String password = binding.etPassword.getText().toString().trim();
 
-        if (email.isEmpty()) {
-            etEmail.setError("Ingresa tu email");
-            valido = false;
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.setError("Email inválido");
-            valido = false;
-        }
-
-        if (password.isEmpty()) {
-            etPassword.setError("Ingresa tu contraseña");
-            valido = false;
-        } else if (password.length() < 6) {
-            etPassword.setError("Mínimo 6 caracteres");
-            valido = false;
-        }
-
-        return valido;
-    }
-
-    private void realizarLogin(String email, String password) {
-        btnLogin.setEnabled(false);
-
-        Map<String, String> credentials = new HashMap<>();
-        credentials.put("correo", email);
-        credentials.put("contrasena", password);
-
-        ApiService apiService = RetrofitClient.getApiService();
-        apiService.login(credentials).enqueue(new Callback<LoginResponse>() {
-            @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                btnLogin.setEnabled(true);
-
-                if (response.isSuccessful() && response.body() != null) {
-                    LoginResponse loginResponse = response.body();
-
-                    if (loginResponse.isSuccess()) {
-                        // Login exitoso
-                        guardarSesion(loginResponse);
-                        iniciarMainActivity();
-                    } else {
-                        String errorMsg = loginResponse.getMessage() != null ?
-                                loginResponse.getMessage() : "Credenciales incorrectas";
-                        Toast.makeText(LoginActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    // Manejo de errores HTTP
-                    try {
-                        String errorBody = response.errorBody() != null ?
-                                response.errorBody().string() : "Error desconocido";
-                        Toast.makeText(LoginActivity.this, "Error: " + errorBody, Toast.LENGTH_SHORT).show();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Por favor rellena todos los campos", Toast.LENGTH_SHORT).show();
+                return;
             }
 
-            @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
-                btnLogin.setEnabled(true);
-                Toast.makeText(LoginActivity.this, "Error de conexión: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+            viewModel.login(email, password);
+        });
+
+        binding.tvRegister.setOnClickListener(v -> {
+            startActivity(new Intent(this, RegisterActivity.class));
         });
     }
 
-    private void guardarSesion(LoginResponse response) {
-        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
+    private void observeViewModel() {
+        viewModel.isLoading.observe(this, isLoading -> {
+            binding.btnLogin.setEnabled(!isLoading);
+            // Podríamos añadir un ProgressBar aquí en el futuro
+        });
 
-        editor.putBoolean("isLoggedIn", true);
-        editor.putInt("userId", response.getUser_id());
-        editor.putString("userEmail", etEmail.getText().toString().trim());
-        editor.putString("userName", response.getNombre());
+        viewModel.error.observe(this, errorMessage -> {
+            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
+        });
 
-        editor.apply();
-    }
-
-    private void iniciarMainActivity() {
-        Toast.makeText(this, "Login exitoso", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
+        viewModel.loginResult.observe(this, response -> {
+            Toast.makeText(this, "¡Bienvenido, " + response.getNombre() + "!", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+        });
     }
 }

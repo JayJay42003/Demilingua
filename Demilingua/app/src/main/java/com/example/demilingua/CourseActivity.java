@@ -1,4 +1,3 @@
-// CursoActivity.java
 package com.example.demilingua;
 
 import android.content.Intent;
@@ -6,141 +5,105 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.demilingua.controller.ApiService;
-import com.example.demilingua.controller.RetrofitClient;
+import com.example.demilingua.databinding.ActivityCourseBinding;
 import com.example.demilingua.model.Curso;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import javax.inject.Inject;
+import dagger.hilt.android.AndroidEntryPoint;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * Muestra la lista de cursos de un idioma (id y nombre
- * recibidos por Intent extras:  "id"  y  "nombre").
- */
-public class CourseActivity extends AppCompatActivity implements CourseAdapter.OnCourseClickListener{
+@AndroidEntryPoint
+public class CourseActivity extends AppCompatActivity implements CourseAdapter.OnCourseClickListener {
 
-    private RecyclerView rvCursos;
-    private TextView tvEmpty;
-    private ProgressBar pbCursos;
+    private ActivityCourseBinding binding;
     private CourseAdapter adapter;
     private final List<Curso> cursoList = new ArrayList<>();
-    private ApiService apiService;
+
+    @Inject
+    ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_course);
+        binding = ActivityCourseBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        // ───────────────────────── Toolbar ─────────────────────────
         String idiomaNombre = getIntent().getStringExtra("nombre");
-        int    idiomaId     = getIntent().getIntExtra("id", 0);
+        int idiomaId = getIntent().getIntExtra("idiomaId", 0);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(idiomaNombre != null ? idiomaNombre : "Cursos");
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setSupportActionBar(binding.toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(idiomaNombre != null ? idiomaNombre : "Cursos");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
-        // ───────────────────────── RecyclerView ─────────────────────────
-        rvCursos = findViewById(R.id.rvModulos);
-        rvCursos.setLayoutManager(new GridLayoutManager(this, 2));   // ← cuadrícula 2×N
-        adapter  = new CourseAdapter(cursoList,this);
-        rvCursos.setAdapter(adapter);
-
-        // Vistas de estado
-        tvEmpty = findViewById(R.id.tvEmpty);
-        pbCursos = findViewById(R.id.pbCursos);
-
-        // ───────────────────────── Retrofit ─────────────────────────
-        apiService = RetrofitClient.getApiService();
-        // Cargar cursos por idioma
+        setupRecyclerView();
         cargarCursosPorIdioma(idiomaId);
     }
 
+    private void setupRecyclerView() {
+        binding.rvModulos.setLayoutManager(new GridLayoutManager(this, 2));
+        adapter = new CourseAdapter(cursoList, this);
+        binding.rvModulos.setAdapter(adapter);
+    }
+
     private void cargarCursosPorIdioma(int idiomaId) {
-        if (pbCursos != null) pbCursos.setVisibility(View.VISIBLE);
-        if (tvEmpty != null) tvEmpty.setVisibility(View.GONE);
+        binding.pbCursos.setVisibility(View.VISIBLE);
+        binding.tvEmpty.setVisibility(View.GONE);
 
-        Call<List<Map<String,String>>> call = apiService.course(idiomaId);
-
-        call.enqueue(new Callback<>() {
+        apiService.getCursos(idiomaId).enqueue(new Callback<List<Curso>>() {
             @Override
-            public void onResponse(Call<List<Map<String,String>>> call,
-                                   Response<List<Map<String,String>>> response) {
-                if (pbCursos != null) pbCursos.setVisibility(View.GONE);
+            public void onResponse(@NonNull Call<List<Curso>> call, @NonNull Response<List<Curso>> response) {
+                binding.pbCursos.setVisibility(View.GONE);
 
                 if (response.isSuccessful() && response.body() != null) {
-                    List<Map<String,String>> raw = response.body();
                     cursoList.clear();
-
-                    for (Map<String,String> m : raw) {
-                        cursoList.add(new Curso(
-                                Integer.parseInt(m.get("id")),
-                                m.get("nombre"),
-                                m.get("descripcion"),
-                                m.get("dificultad"),
-                                Integer.parseInt(m.get("idioma_id"))
-                        ));
-                    }
+                    cursoList.addAll(response.body());
                     adapter.notifyDataSetChanged();
-
-                    tvEmpty.setVisibility(cursoList.isEmpty() ? View.VISIBLE : View.GONE);
-
+                    binding.tvEmpty.setVisibility(cursoList.isEmpty() ? View.VISIBLE : View.GONE);
                 } else {
-                    String err = "Código: " + response.code();
-                    try {
-                        if (response.errorBody() != null) {
-                            err += " - " + response.errorBody().string();
-                        }
-                    } catch (IOException ignored) {
-                    }
-
-                    Toast.makeText(CourseActivity.this,
-                            "Error al obtener cursos: " + err,
-                            Toast.LENGTH_LONG).show();
-                    tvEmpty.setVisibility(View.VISIBLE);
+                    Toast.makeText(CourseActivity.this, "Error al obtener cursos", Toast.LENGTH_SHORT).show();
+                    binding.tvEmpty.setVisibility(View.VISIBLE);
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<Map<String,String>>> call,
-                                  @NonNull Throwable t) {
-                if (pbCursos != null) pbCursos.setVisibility(View.GONE);
-                Log.e("CourseActivity", "Fallo Retrofit", t);
-                Toast.makeText(CourseActivity.this,
-                        "Sin conexión: " + t.getMessage(),
-                        Toast.LENGTH_LONG).show();
-                tvEmpty.setVisibility(View.VISIBLE);
+            public void onFailure(@NonNull Call<List<Curso>> call, @NonNull Throwable t) {
+                binding.pbCursos.setVisibility(View.GONE);
+                Toast.makeText(CourseActivity.this, "Sin conexión", Toast.LENGTH_SHORT).show();
+                binding.tvEmpty.setVisibility(View.VISIBLE);
             }
         });
     }
 
-    @Override public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId()==android.R.id.home){ finish(); return true; }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
-
 
     @Override
     public void onCourseClick(Curso curso) {
         Intent i = new Intent(this, TestActivity.class);
         i.putExtra("cursoId", curso.getId());
         i.putExtra("cursoName", curso.getNombre());
-        i.putExtra("idiomaId",curso.getIdioma_id());
+        i.putExtra("idiomaId", curso.getIdiomaId());
         startActivity(i);
     }
 }

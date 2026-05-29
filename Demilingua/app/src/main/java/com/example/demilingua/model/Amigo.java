@@ -2,7 +2,7 @@ package com.example.demilingua.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Idioma {
+public class Amigo {
 
     @SerializedName("id")
     private int id;
@@ -10,13 +10,13 @@ public class Idioma {
     @SerializedName("nombre")
     private String nombre;
 
-    @SerializedName("codigo_iso")
-    private String codigoIso;
+    @SerializedName("puntos")
+    private int puntos;
 
-    public Idioma(int id, String nombre, String codigoIso) {
+    public Amigo(int id, String nombre, int puntos) {
         this.id = id;
         this.nombre = nombre;
-        this.codigoIso = codigoIso;
+        this.puntos = puntos;
     }
 
     public int getId() {
@@ -35,20 +35,20 @@ public class Idioma {
         this.nombre = nombre;
     }
 
-    public String getCodigoIso() {
-        return codigoIso;
+    public int getPuntos() {
+        return puntos;
     }
 
-    public void setCodigoIso(String codigoIso) {
-        this.codigoIso = codigoIso;
+    public void setPuntos(int puntos) {
+        this.puntos = puntos;
     }
 
     @Override
     public String toString() {
-        return "Idioma{" +
+        return "Amigo{" +
                 "id=" + id +
                 ", nombre='" + nombre + "'" +
-                ", codigoIso='" + codigoIso + "'" +
+                ", puntos=" + puntos +
                 '}';
     }
 }

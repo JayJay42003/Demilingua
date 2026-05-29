@@ -1,56 +1,44 @@
 package com.example.demilingua;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import com.google.android.material.snackbar.Snackbar;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Handler;
-import android.os.Looper;
-import android.view.View;
+import com.example.demilingua.data.TokenManager;
 
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
+import javax.inject.Inject;
+import dagger.hilt.android.AndroidEntryPoint;
 
-import com.example.demilingua.databinding.ActivitySplashBinding;
-
-import java.util.Timer;
-import java.util.TimerTask;
-
+@AndroidEntryPoint
 public class SplashActivity extends AppCompatActivity {
+
+    @Inject
+    TokenManager tokenManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        // Ocultar ActionBar
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
 
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
-                boolean isLoggedIn = prefs.getBoolean("isLoggedIn", false);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            String token = tokenManager.getToken();
 
-                Intent intent;
-                if (isLoggedIn) {
-                    intent = new Intent(SplashActivity.this, MainActivity.class);
-                } else {
-                    intent = new Intent(SplashActivity.this, LoginActivity.class);
-                }
-                startActivity(intent);
-                finish(); // Cierra esta actividad para que no se pueda volver atrás
+            Intent intent;
+            if (token != null) {
+                intent = new Intent(SplashActivity.this, MainActivity.class);
+            } else {
+                intent = new Intent(SplashActivity.this, LoginActivity.class);
             }
-        }, 3500);
-
+            startActivity(intent);
+            finish();
+        }, 2000); // Reducido a 2s para mejor UX
     }
 
     @Override

@@ -26,6 +26,11 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.ViewHo
         this.listener = listener;
     }
 
+    public void updateData(List<Idioma> newData) {
+        this.languages = newData;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -37,13 +42,13 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Idioma idioma = languages.get(position);
-        holder.tvName.setText(idioma.getName());
+        holder.tvName.setText(idioma.getNombre());
 
         // --- LÓGICA DE CARGA DINÁMICA DE IMÁGENES ---
         // 1. Intentar cargar desde una URL si el modelo la tuviera (ej: idioma.getIconUrl())
         // 2. Como solución robusta, usamos un CDN de banderas basado en el nombre del idioma
-        
-        String langName = idioma.getName().toLowerCase();
+
+        String langName = idioma.getNombre().toLowerCase();
         String flagUrl = "";
 
         if (langName.contains("inglés") || langName.contains("ingles")) {

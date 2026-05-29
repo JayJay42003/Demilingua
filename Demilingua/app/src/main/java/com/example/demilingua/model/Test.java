@@ -1,11 +1,16 @@
 package com.example.demilingua.model;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Clase que representa un test/examen en el sistema
  */
 public class Test {
+    @SerializedName("id")
     private int id;
-    private int curso_id;
+    @SerializedName("curso_id")
+    private int cursoId;
+    @SerializedName("titulo")
     private String titulo;
 
     // Constructores
@@ -13,9 +18,9 @@ public class Test {
         // Constructor vacío necesario para frameworks
     }
 
-    public Test(int id, int curso_id, String titulo) {
+    public Test(int id, int cursoId, String titulo) {
         this.id = id;
-        this.curso_id = curso_id;
+        this.cursoId = cursoId;
         this.titulo = titulo;
     }
 
@@ -28,15 +33,15 @@ public class Test {
         this.id = id;
     }
 
-    public int getCurso_id() {
-        return curso_id;
+    public int getCursoId() {
+        return cursoId;
     }
 
-    public void setCurso_id(int curso_id) {
-        if (curso_id <= 0) {
+    public void setCursoId(int cursoId) {
+        if (cursoId <= 0) {
             throw new IllegalArgumentException("El ID del curso debe ser positivo");
         }
-        this.curso_id = curso_id;
+        this.cursoId = cursoId;
     }
 
     public String getTitulo() {
@@ -58,7 +63,7 @@ public class Test {
     public String toString() {
         return "Test{" +
                 "id=" + id +
-                ", curso_id=" + curso_id +
+                ", curso_id=" + cursoId +
                 ", titulo='" + titulo + '\'' +
                 '}';
     }
@@ -71,7 +76,7 @@ public class Test {
         if (titulo == null || titulo.trim().isEmpty()) {
             throw new IllegalArgumentException("El título del test es requerido");
         }
-        if (curso_id <= 0) {
+        if (cursoId <= 0) {
             throw new IllegalArgumentException("ID de curso inválido");
         }
     }

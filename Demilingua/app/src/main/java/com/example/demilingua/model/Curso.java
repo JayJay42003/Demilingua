@@ -1,27 +1,33 @@
-
 package com.example.demilingua.model;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Clase que representa un curso en el sistema
  */
 public class Curso {
+    @SerializedName("id")
     private int id;
+    @SerializedName("nombre")
     private String nombre;
+    @SerializedName("descripcion")
     private String descripcion;
+    @SerializedName("dificultad")
     private String dificultad;
-    private int idioma_id;
+    @SerializedName("idioma_id")
+    private int idiomaId;
 
     // Constructores
     public Curso() {
         // Constructor vacío necesario para frameworks
     }
 
-    public Curso(int id, String nombre, String descripcion, String dificultad, int idioma_id) {
+    public Curso(int id, String nombre, String descripcion, String dificultad, int idiomaId) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.dificultad = dificultad;
-        this.idioma_id = idioma_id;
+        this.idiomaId = idiomaId;
     }
 
     // Getters y Setters
@@ -63,15 +69,15 @@ public class Curso {
         this.dificultad = dificultad;
     }
 
-    public int getIdioma_id() {
-        return idioma_id;
+    public int getIdiomaId() {
+        return idiomaId;
     }
 
-    public void setIdioma_id(int idioma_id) {
-        if (idioma_id <= 0) {
+    public void setIdiomaId(int idiomaId) {
+        if (idiomaId <= 0) {
             throw new IllegalArgumentException("El ID del idioma debe ser positivo");
         }
-        this.idioma_id = idioma_id;
+        this.idiomaId = idiomaId;
     }
 
     // Métodos útiles
@@ -81,7 +87,7 @@ public class Curso {
                 "id=" + id +
                 ", nombre='" + nombre + '\'' +
                 ", dificultad='" + dificultad + '\'' +
-                ", idioma_id=" + idioma_id +
+                ", idioma_id=" + idiomaId +
                 '}';
     }
 

@@ -98,7 +98,7 @@
             android:layout_height="48dp"
             android:text="REGISTRARSE"
             android:textAllCaps="false"
-            android:backgroundTint="@color/purple_500"
+            android:backgroundTint="@color/primary_purple"
             android:textColor="@color/white"
             android:layout_marginTop="8dp"
             app:cornerRadius="24dp"/>

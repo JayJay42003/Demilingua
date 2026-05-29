@@ -4,10 +4,14 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
+        android:name=".DemilinguaApplication"
         android:icon="@drawable/icon"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:theme="@style/Theme.Demilingua">
+        android:theme="@style/Theme.Demilingua"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".TestActivity"
             android:exported="false"
@@ -40,6 +44,10 @@
             android:theme="@style/Theme.Demilingua" />
         <activity
             android:name=".MainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Demilingua" />
+        <activity
+            android:name=".AmigosActivity"
             android:exported="false"
             android:theme="@style/Theme.Demilingua" />
         <activity

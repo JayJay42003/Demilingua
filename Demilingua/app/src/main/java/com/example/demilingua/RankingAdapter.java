@@ -14,8 +14,13 @@ import java.util.List;
 
 public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.VH> {
 
-    private final List<RankingItem> data;
+    private List<RankingItem> data;
     public RankingAdapter(List<RankingItem> data){ this.data = data; }
+
+    public void updateData(List<RankingItem> newData) {
+        this.data = newData;
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override public VH onCreateViewHolder(@NonNull ViewGroup p, int v){
@@ -28,7 +33,7 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.VH> {
         h.tvPos.setText(String.valueOf(i+1));
         h.tvUser.setText(item.getNombre());
         h.tvIdioma.setText(item.getDivision());
-        h.tvPuntos.setText(item.getRacha());
+        h.tvPts.setText(item.getRacha());
     }
     @Override public int getItemCount(){ return data.size(); }
 

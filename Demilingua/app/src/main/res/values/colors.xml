@@ -3,16 +3,23 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     
-    <!-- Colores Corporativos (Sincronizados con la Web) -->
+    <!-- Colores Predeterminados (Material Design Classic) -->
     <color name="primary_purple">#6200EE</color>
     <color name="primary_dark">#3700B3</color>
     <color name="accent_teal">#03DAC5</color>
-    <color name="background_light">#f8f9fa</color>
+    <color name="background_light">#FFFFFF</color>
     
-    <!-- Colores Secundarios -->
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="blue">#FF0000FF</color>
-    <color name="gray_200">#eeeeee</color>
-    <color name="gray_500">#626262</color>
-    <color name="red_500">#EF1932</color>
+    <!-- Colores de Estado Estándar -->
+    <color name="success_green">#4CAF50</color>
+    <color name="error_red">#F44336</color>
+    <color name="warning_orange">#FF9800</color>
+    <color name="info_blue">#2196F3</color>
+    
+    <!-- Grises Estándar -->
+    <color name="gray_100">#F5F5F5</color>
+    <color name="gray_200">#EEEEEE</color>
+    <color name="gray_500">#9E9E9E</color>
+    <color name="gray_800">#424242</color>
+    <color name="gray_900">#212121</color>
+    <color name="red_500">#8B0000</color>
 </resources>

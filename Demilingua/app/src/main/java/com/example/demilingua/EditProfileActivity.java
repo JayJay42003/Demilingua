@@ -1,191 +1,132 @@
 package com.example.demilingua;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.EditText;
+import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.example.demilingua.controller.ApiService;
-import com.example.demilingua.controller.RetrofitClient;
+import com.example.demilingua.data.TokenManager;
+import com.example.demilingua.databinding.ActivityEditProfileBinding;
+import com.example.demilingua.model.GenericResponse;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
+import javax.inject.Inject;
+import dagger.hilt.android.AndroidEntryPoint;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import android.view.View;
-import android.widget.ProgressBar;
-
-/**
- * Permite al usuario editar nombre, correo **y contraseña**.
- * Los datos se guardan en SharedPreferences.
- */
+@AndroidEntryPoint
 public class EditProfileActivity extends AppCompatActivity {
 
-    private static final String PREFS = "AppPrefs";
+    private ActivityEditProfileBinding binding;
+    private int usuarioId;
 
-    private EditText etName, etEmail, etPassword, etConfirm;
-    private Button btnSave, btnDeleteAccount;
-    private ProgressBar pbEdit;
-    private SharedPreferences prefs;
-    private ApiService api;
+    @Inject
+    ApiService api;
+
+    @Inject
+    TokenManager tokenManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_profile);   // tu layout con los nuevos campos
+        binding = ActivityEditProfileBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        // Toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.edit_profile);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setSupportActionBar(binding.toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Editar Perfil");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
-        // Referencias
-        etName = findViewById(R.id.etName);
-        etEmail = findViewById(R.id.etEmail);
-        etPassword = findViewById(R.id.etPassword);
-        etConfirm = findViewById(R.id.etConfirmarContrasena);
-        btnSave = findViewById(R.id.btnSave);
-        btnDeleteAccount = findViewById(R.id.btnDeleteAccount);
-        pbEdit = findViewById(R.id.pbEditProfile);
+        usuarioId = getSharedPreferences("demilingua_prefs", MODE_PRIVATE).getInt("userId", 0);
 
-        // Cargar datos actuales
-        prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
-        etName.setText(prefs.getString("userName", ""));
-        etEmail.setText(prefs.getString("userEmail", ""));
-
-        // Retrofit
-        api = RetrofitClient.getApiService();
-
-        btnSave.setOnClickListener(v -> guardarCambios());
-        btnDeleteAccount.setOnClickListener(v -> confirmarBorradoCuenta());
+        binding.btnSave.setOnClickListener(v -> guardarCambios());
+        binding.btnDeleteAccount.setOnClickListener(v -> confirmarBorradoCuenta());
     }
 
     private void confirmarBorradoCuenta() {
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("¿Borrar cuenta?")
-                .setMessage("Esta acción es permanente y perderás todo tu progreso.")
+                .setMessage("Esta acción es permanente.")
                 .setPositiveButton("Borrar", (d, w) -> borrarCuenta())
                 .setNegativeButton("Cancelar", null)
                 .show();
     }
 
     private void borrarCuenta() {
-        int usuarioId = prefs.getInt("userId", 0);
-        if (pbEdit != null) pbEdit.setVisibility(View.VISIBLE);
-        
-        api.deleteUser(usuarioId).enqueue(new Callback<Map<String, String>>() {
+        binding.pbEditProfile.setVisibility(View.VISIBLE);
+        api.deleteUser(usuarioId).enqueue(new Callback<GenericResponse>() {
             @Override
-            public void onResponse(Call<Map<String, String>> call, Response<Map<String, String>> response) {
+            public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
                 if (response.isSuccessful()) {
-                    prefs.edit().clear().apply();
-                    android.content.Intent intent = new android.content.Intent(EditProfileActivity.this, LoginActivity.class);
-                    intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    tokenManager.clearToken();
+                    Intent intent = new Intent(EditProfileActivity.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
+                } else {
+                    binding.pbEditProfile.setVisibility(View.GONE);
+                    Toast.makeText(EditProfileActivity.this, "Error al borrar cuenta", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<Map<String, String>> call, Throwable t) {
-                if (pbEdit != null) pbEdit.setVisibility(View.GONE);
-                Toast.makeText(EditProfileActivity.this, "Error al borrar cuenta", Toast.LENGTH_SHORT).show();
+            public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
+                binding.pbEditProfile.setVisibility(View.GONE);
+                Toast.makeText(EditProfileActivity.this, "Error de conexión", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-
     private void guardarCambios() {
-        String nombre = etName.getText().toString().trim();
-        String correo = etEmail.getText().toString().trim();
-        String pass = etPassword.getText().toString();
-        String confirm = etConfirm.getText().toString();
+        String nombre = binding.etName.getText().toString().trim();
+        String correo = binding.etEmail.getText().toString().trim();
+        String pass = binding.etPassword.getText().toString();
+        String confirm = binding.etConfirmarContrasena.getText().toString();
 
-        // Validar nombre / correo
         if (TextUtils.isEmpty(nombre) || TextUtils.isEmpty(correo)) {
-            Toast.makeText(this, "Rellenar todos los campos", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Nombre y correo son obligatorios", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Validar contraseña si el usuario escribió algo
-        if (!TextUtils.isEmpty(pass) || !TextUtils.isEmpty(confirm)) {
-            if (!pass.equals(confirm)) {
-                Toast.makeText(this, "Contraseñas no son iguales", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (pass.length() < 6) {
-                Toast.makeText(this, "Contraseña muy corta", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        if (!TextUtils.isEmpty(pass) && !pass.equals(confirm)) {
+            Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        // 1. Obtenemos el ID del usuario directamente
-        int usuarioId = prefs.getInt("userId", 0);
+        binding.pbEditProfile.setVisibility(View.VISIBLE);
+        binding.btnSave.setEnabled(false);
 
-        // 2. Llamada Retrofit usando las variables reales: usuarioId, nombre, correo y pass (opcional)
-        if (pbEdit != null) pbEdit.setVisibility(View.VISIBLE);
-        btnSave.setEnabled(false);
-        
-        // Si pass está vacío, enviamos null para que el backend no la actualice
-        String passToSend = TextUtils.isEmpty(pass) ? null : pass;
-        Call<Map<String,String>> call = api.updateUser(usuarioId, nombre, correo, passToSend);
-
-        call.enqueue(new Callback<Map<String, String>>() {
+        api.updateUser(usuarioId, nombre, correo, pass).enqueue(new Callback<GenericResponse>() {
             @Override
-            public void onResponse(Call<Map<String,String>> call,
-                                   Response<Map<String,String>> res) {
-                if (pbEdit != null) pbEdit.setVisibility(View.GONE);
-                btnSave.setEnabled(true);
+            public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
+                binding.pbEditProfile.setVisibility(View.GONE);
+                binding.btnSave.setEnabled(true);
 
-                if (res.isSuccessful() && res.body() != null
-                        && "ok".equals(res.body().get("status"))) {
-
-                    // Guardar los nuevos datos en el dispositivo
-                    prefs.edit()
-                            .putString("userName" , nombre)
-                            .putString("userEmail", correo)
-                            .apply();
-
-                    Toast.makeText(EditProfileActivity.this,
-                            "Perfil actualizado",
-                            Toast.LENGTH_SHORT).show();
+                if (response.isSuccessful()) {
+                    Toast.makeText(EditProfileActivity.this, "Perfil actualizado", Toast.LENGTH_SHORT).show();
                     finish();
-
                 } else {
-                    Toast.makeText(EditProfileActivity.this,
-                            "Error: " + obtenerMensaje(res),
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(EditProfileActivity.this, "Error al actualizar", Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<Map<String,String>> call, Throwable t) {
-                if (pbEdit != null) pbEdit.setVisibility(View.GONE);
-                btnSave.setEnabled(true);
-                Toast.makeText(EditProfileActivity.this,
-                        "Sin conexión: " + t.getMessage(),
-                        Toast.LENGTH_LONG).show();
+            public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
+                binding.pbEditProfile.setVisibility(View.GONE);
+                binding.btnSave.setEnabled(true);
+                Toast.makeText(EditProfileActivity.this, "Error de conexión", Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    private String obtenerMensaje(Response<Map<String,String>> res) {
-        if (res.body() != null && res.body().get("message") != null) {
-            return res.body().get("message");
-        } else {
-            return "Código " + res.code();
-        }
     }
 
     @Override

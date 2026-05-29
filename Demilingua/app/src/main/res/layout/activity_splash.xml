@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context=".SplashActivity"
-    android:background="@color/backg">
+    android:background="@color/background_light">
 
 
     <ImageView android:layout_margin="5px"
