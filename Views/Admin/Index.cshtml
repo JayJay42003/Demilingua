@@ -1,0 +1,151 @@
+@model List<Dictionary<string, string>>
+@{
+    ViewData["Title"] = "Panel de Administracion";
+}
+
+<div class="container mt-4">
+    <h2>Panel de Administracion</h2>
+    <div class="row mb-4">
+        <div class="col-md-3 mb-2">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body text-center">
+                    <h5>Usuarios</h5>
+                    <p class="display-6 m-0">@ViewBag.TotalUsers</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-2">
+            <a asp-action="ManageTests" class="card bg-success text-white text-decoration-none h-100 hover-card">
+                <div class="card-body text-center">
+                    <h5>Tests</h5>
+                    <p class="m-0"><i class="bi bi-pencil-square fs-1"></i></p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 mb-2">
+            <a asp-action="ManageIdiomas" class="card bg-warning text-dark text-decoration-none h-100 hover-card">
+                <div class="card-body text-center">
+                    <h5>Idiomas</h5>
+                    <p class="m-0"><i class="bi bi-translate fs-1"></i></p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 mb-2">
+            <a asp-action="ManageCourses" class="card bg-info text-white text-decoration-none h-100 hover-card">
+                <div class="card-body text-center">
+                    <h5>Cursos</h5>
+                    <p class="m-0"><i class="bi bi-book fs-1"></i></p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h4>Usuarios Registrados</h4>
+    <div class="mb-3 d-flex gap-2">
+        <input type="text" id="searchInput" class="form-control" placeholder="Buscar por nombre o correo..." onkeyup="filterAndPaginate()" />
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Vidas</th>
+                    <th>Racha</th>
+                    <th>Accion</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                @foreach (var user in Model)
+                {
+                    <tr class="user-row">
+                        <td>@user["id"]</td>
+                        <td>@user["nombre"]</td>
+                        <td>@user["correo"]</td>
+                        <td>@user["vidas"]</td>
+                        <td>@user["racha_actual"]</td>
+                        <td>
+                            <form method="post" asp-action="DeleteUser" class="d-inline"
+                                  onsubmit="return confirm('Eliminar usuario @user["nombre"]?')">
+                                <input type="hidden" name="userId" value="@user["id"]" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <nav>
+        <ul class="pagination justify-content-center" id="pagination"></ul>
+    </nav>
+    <p class="text-center text-muted" id="pageInfo"></p>
+</div>
+
+@section Scripts {
+<script>
+    const rowsPerPage = 10;
+    let currentPage = 1;
+    const allRows = document.querySelectorAll('.user-row');
+
+    function filterAndPaginate() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        allRows.forEach(row => {
+            const name = row.children[1].innerText.toLowerCase();
+            const email = row.children[2].innerText.toLowerCase();
+            row.style.display = name.includes(query) || email.includes(query) ? '' : 'none';
+            row.classList.toggle('filtered-out', !(name.includes(query) || email.includes(query)));
+        });
+        currentPage = 1;
+        renderPage();
+    }
+
+    function renderPage() {
+        const visibleRows = [...allRows].filter(r => !r.classList.contains('filtered-out'));
+        const totalPages = Math.ceil(visibleRows.length / rowsPerPage) || 1;
+        
+        visibleRows.forEach((row, i) => {
+            const pageIdx = Math.floor(i / rowsPerPage) + 1;
+            row.style.display = pageIdx === currentPage ? '' : 'none';
+        });
+
+        document.getElementById('pageInfo').innerText = 
+            visibleRows.length > 0 ? `Mostrando pagina ${currentPage} de ${totalPages} (${visibleRows.length} usuarios)` : 'Sin resultados';
+
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = '';
+        if (totalPages <= 1) return;
+        
+        const prev = document.createElement('li');
+        prev.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+        prev.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${currentPage-1})">Anterior</a>`;
+        pagination.appendChild(prev);
+        
+        for (let p = 1; p <= totalPages; p++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${p === currentPage ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${p})">${p}</a>`;
+            pagination.appendChild(li);
+        }
+        
+        const next = document.createElement('li');
+        next.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+        next.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${currentPage+1})">Siguiente</a>`;
+        pagination.appendChild(next);
+    }
+
+    function goToPage(p) {
+        currentPage = p;
+        const visibleRows = [...allRows].filter(r => !r.classList.contains('filtered-out'));
+        const totalPages = Math.ceil(visibleRows.length / rowsPerPage) || 1;
+        currentPage = Math.max(1, Math.min(p, totalPages));
+        renderPage();
+        window.scrollTo(0, 0);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => renderPage());
+</script>
+}

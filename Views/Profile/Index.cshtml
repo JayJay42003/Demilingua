@@ -1,0 +1,186 @@
+@model Demilingua.Models.UserProfileViewModel
+@{
+    ViewData["Title"] = "Mi Perfil";
+    var divisionColor = Model.DivisionId switch
+    {
+        1 => "#cd7f32",
+        2 => "#c0c0c0",
+        3 => "#ffd700",
+        4 => "#e5e4e2",
+        5 => "#b9f2ff",
+        _ => "#6c757d"
+    };
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <!-- Cabecera: Avatar + Nombre + Correo -->
+            <div class="card shadow-sm mb-4" style="border-radius: 16px;">
+                <div class="card-body text-center p-4">
+                    <div class="avatar-circle">@(string.IsNullOrEmpty(Model.Nombre) ? "U" : Model.Nombre.Substring(0,1).ToUpper())</div>
+                    <h3 class="fw-bold mb-1">@Model.Nombre</h3>
+                    <p class="text-muted mb-0">@Model.Correo</p>
+                </div>
+            </div>
+
+            <!-- Grid 2x2 de estadisticas -->
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <div class="card shadow-sm h-100 text-center" style="border-radius: 12px;">
+                        <div class="card-body py-3">
+                            <div class="fs-4 mb-1">&#x1F3C6;</div>
+                            <small class="text-muted text-uppercase fw-bold">Division</small>
+                            <h5 class="fw-bold mt-1 mb-0" style="color:@divisionColor">@Model.DivisionNombre</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card shadow-sm h-100 text-center" style="border-radius: 12px;">
+                        <div class="card-body py-3">
+                            <div class="fs-4 mb-1">&#x2B50;</div>
+                            <small class="text-muted text-uppercase fw-bold">XP Total</small>
+                            <h5 class="fw-bold mt-1 mb-0">@Model.TotalXp.ToString("N0")</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card shadow-sm h-100 text-center" style="border-radius: 12px;">
+                        <div class="card-body py-3">
+                            <div class="fs-4 mb-1">&#x1F525;</div>
+                            <small class="text-muted text-uppercase fw-bold">Racha</small>
+                            <h5 class="fw-bold mt-1 mb-0">@Model.RachaActual dias</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card shadow-sm h-100 text-center" style="border-radius: 12px;">
+                        <div class="card-body py-3">
+                            <div class="fs-4 mb-1">&#x1F30D;</div>
+                            <small class="text-muted text-uppercase fw-bold">Mejor Idioma</small>
+                            <h5 class="fw-bold mt-1 mb-0">@Model.TopIdiomaNombre</h5>
+                            <small class="text-success">@Model.TopIdiomaXp.ToString("N0") XP</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra progreso Division -->
+            <div class="card shadow-sm mb-4" style="border-radius: 12px;">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold"><i class="bi bi-graph-up me-1"></i>Progreso de Division</span>
+                        @if (Model.DivisionId >= 5)
+                        {
+                            <span class="badge bg-warning text-dark">Maximo</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted small">@Model.PorcentajeDivision% hacia la siguiente</span>
+                        }
+                    </div>
+                    <div class="progress" style="height: 18px; border-radius: 9px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated fw-bold"
+                             role="progressbar"
+                             style="width: @Model.PorcentajeDivision%; background-color: @divisionColor;">
+                            @if (Model.PorcentajeDivision > 10)
+                            {
+                                @($"{Model.PorcentajeDivision}%")
+                            }
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-1">
+                        <small class="text-muted">@Model.XpDivisionActual.ToString("N0") XP</small>
+                        @if (Model.DivisionId < 5)
+                        {
+                            <small class="text-muted">@Model.XpSiguienteDivision.ToString("N0") XP</small>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Amigos -->
+            <a href="/Friends" class="text-decoration-none text-dark">
+                <div class="card shadow-sm mb-4 hover-card" style="border-radius: 12px; cursor: pointer;">
+                    <div class="card-body py-3 d-flex justify-content-between align-items-center">
+                        <span class="fw-bold"><i class="bi bi-people-fill me-1"></i>Amigos</span>
+                        <span class="badge bg-primary rounded-pill px-3">@Model.NumeroAmigos</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Progreso por idioma -->
+            @if (Model.IdiomasProgreso.Any())
+            {
+                <div class="card shadow-sm mb-4" style="border-radius: 12px;">
+                    <div class="card-header bg-white fw-bold">
+                        <i class="bi bi-bar-chart-fill me-1"></i>Progreso por idioma
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <tbody>
+                                    @foreach (var item in Model.IdiomasProgreso.OrderByDescending(x => x.Puntos))
+                                    {
+                                        <tr>
+                                            <td class="ps-3 fw-bold" style="width: 120px;">@item.IdiomaNombre</td>
+                                            <td class="text-end pe-3" style="width: 90px;">@item.Puntos.ToString("N0") XP</td>
+                                            <td class="pe-3">
+                                                <div class="progress" style="height: 10px; border-radius: 5px;">
+                                                    <div class="progress-bar bg-success"
+                                                         role="progressbar"
+                                                         style="width: @item.PorcentajeDelTotal%; min-width: 2px;">
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Logros / Insignias -->
+            @if (Model.Logros.Any())
+            {
+                <div class="card shadow-sm mb-4" style="border-radius: 12px;">
+                    <div class="card-header bg-white fw-bold">
+                        <i class="bi bi-award-fill me-1"></i>Logros
+                        <span class="badge bg-success ms-2">@Model.Logros.Count(l => l.Desbloqueado)/@Model.Logros.Count</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            @foreach (var logro in Model.Logros)
+                            {
+                                <div class="col-6 col-md-4 col-lg-3">
+                                    <div class="text-center p-2 rounded-3 @(logro.Desbloqueado ? "bg-light border border-success" : "bg-light border border-secondary opacity-50")">
+                                        <div class="fs-2">@Html.Raw(logro.Icono)</div>
+                                        <small class="fw-bold d-block @(logro.Desbloqueado ? "text-dark" : "text-muted")">@logro.Nombre</small>
+                                        <small class="text-muted" style="font-size: 0.75rem;">@logro.Descripcion</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Botones de accion -->
+            <div class="d-grid gap-2 mb-4">
+                <a asp-action="Edit" class="btn btn-outline-primary btn-lg rounded-pill">
+                    <i class="bi bi-pencil"></i> Editar Perfil
+                </a>
+                <form asp-controller="Account" asp-action="Logout" method="post">
+                    <button type="submit" class="btn btn-danger w-100 rounded-pill"
+                            onclick="return confirm('Seguro que quieres cerrar sesion?');">
+                        <i class="bi bi-box-arrow-right"></i> Cerrar Sesion
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>

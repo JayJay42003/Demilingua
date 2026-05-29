@@ -1,0 +1,311 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+/* Colores corporativos (similar a colors.xml Android) */
+:root {
+  --purple: #6200EE;
+  --purple-dark: #3700B3;
+}
+
+/* Navbar p�rpura */
+.bg-purple {
+  background-color: var(--purple) !important;
+}
+
+/* Bot�n p�rpura reutilizable */
+.btn-purple {
+  background-color: var(--purple);
+  color: #fff;
+  border: none;
+}
+.btn-purple:hover {
+  background-color: var(--purple-dark);
+  color: #fff;
+}
+
+/* Tarjetas suaves */
+.card-login, .course-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Utilidades */
+.hover-card:hover { transform: translateY(-3px); transition: 0.2s; border-color: var(--purple); }
+
+/* Fondo suave */
+body {
+  background-color: #f8f9fa;
+}
+
+/* ===== Mobile App theme provided by user ===== */
+/* Colores de la App M�vil */
+:root {
+    --primary-purple: #6200EE;
+    --primary-dark: #3700B3;
+    --accent-teal: #03DAC5;
+}
+
+body {
+    background-color: #f8f9fa; /* Fondo gris claro suave */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navbar personalizada */
+.bg-purple {
+    background-color: var(--primary-purple) !important;
+}
+
+/* Botones personalizados */
+.btn-primary {
+    background-color: var(--primary-purple);
+    border-color: var(--primary-purple);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+/* Tarjetas con efecto hover (usado en Cursos y Home) */
+.hover-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    border-color: var(--primary-purple);
+}
+
+/* Utilidades */
+.text-purple {
+    color: var(--primary-purple);
+}
+
+a {
+    text-decoration: none;
+}
+
+/* Course path (Duolingo-like) */
+.course-path {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    position: relative;
+    padding: 8px 0 24px;
+}
+
+.course-row {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 16px;
+    align-items: start;
+}
+
+.course-line {
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.course-line .line {
+    width: 4px;
+    background: rgba(98, 0, 238, 0.2);
+    border-radius: 2px;
+    height: 100%;
+    min-height: 120px;
+}
+
+.course-card-wrap {
+    width: 100%;
+}
+
+.course-node {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid #e6e6e6;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.course-node.active:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+}
+
+.course-node.done {
+    border-color: #22c55e;
+    background: #f0fdf4;
+}
+
+.course-node.locked {
+    background: #f8f9fa;
+    color: #8c8c8c;
+}
+
+.node-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    background: #f2f0ff;
+    color: var(--primary-purple);
+    flex-shrink: 0;
+}
+
+.course-node.done .node-icon {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.course-node.locked .node-icon {
+    background: #e9ecef;
+    color: #6c757d;
+}
+
+.node-content h5 {
+    font-weight: 700;
+}
+
+@media (max-width: 576px) {
+    .course-row {
+        grid-template-columns: 24px 1fr;
+    }
+    .course-node {
+        padding: 12px;
+    }
+    .node-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+}
+
+/* ===== Avatar con iniciales ===== */
+.avatar-circle {
+    width: 90px; height: 90px; border-radius: 50%;
+    background: #6200EE; color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem; font-weight: bold;
+    margin: 0 auto 1rem; box-shadow: 0 0 0 3px white;
+}
+
+/* ===== Skeleton loading ===== */
+.skeleton {
+    background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+    min-height: 20px;
+}
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+[data-theme="dark"] .skeleton {
+    background: linear-gradient(90deg, #1e2a4a 25%, #243356 50%, #1e2a4a 75%);
+    background-size: 200% 100%;
+}
+
+/* ===== Animacion corazon al perder vida ===== */
+@keyframes heartBreak {
+    0% { transform: scale(1); opacity: 1; }
+    40% { transform: scale(1.4); opacity: 0.7; color: #ff4444; }
+    100% { transform: scale(0); opacity: 0; }
+}
+.heart-breaking {
+    animation: heartBreak 0.5s ease-out forwards;
+}
+
+/* ===== Animacion entrada course-path ===== */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.course-node {
+    animation: fadeInUp 0.4s ease-out both;
+}
+.course-row:nth-child(1) .course-node { animation-delay: 0.05s; }
+.course-row:nth-child(2) .course-node { animation-delay: 0.10s; }
+.course-row:nth-child(3) .course-node { animation-delay: 0.15s; }
+.course-row:nth-child(4) .course-node { animation-delay: 0.20s; }
+.course-row:nth-child(5) .course-node { animation-delay: 0.25s; }
+
+/* ===== Dark mode ===== */
+[data-theme="dark"] {
+    --bg: #1a1a2e;
+    --card-bg: #16213e;
+    --text: #e0e0e0;
+    --muted: #a0a0a0;
+}
+[data-theme="dark"] body { background-color: var(--bg); color: var(--text); }
+[data-theme="dark"] .card,
+[data-theme="dark"] .table,
+[data-theme="dark"] .list-group-item,
+[data-theme="dark"] .modal-content { background-color: var(--card-bg); color: var(--text); }
+[data-theme="dark"] .bg-white { background-color: var(--card-bg) !important; }
+[data-theme="dark"] .bg-light { background-color: #1a1a35 !important; }
+[data-theme="dark"] .text-dark { color: var(--text) !important; }
+[data-theme="dark"] .text-muted { color: var(--muted) !important; }
+[data-theme="dark"] .border, [data-theme="dark"] .border-top, [data-theme="dark"] .border-bottom { border-color: #2a2a4a !important; }
+[data-theme="dark"] .table-light { background-color: #1e2a4a !important; }
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) { background-color: #1a2540; }
+[data-theme="dark"] .list-group-flush > .list-group-item { border-color: #2a2a4a; }
+[data-theme="dark"] .dropdown-menu { background-color: var(--card-bg); border-color: #2a2a4a; }
+[data-theme="dark"] .dropdown-item { color: var(--text); }
+[data-theme="dark"] .dropdown-item:hover { background-color: #243356; }
+[data-theme="dark"] .alert-light { background-color: #1a2a45; border-color: #2a3a55; color: var(--text); }
+[data-theme="dark"] .form-control, [data-theme="dark"] .form-select { background-color: #0d1b33; color: var(--text); border-color: #2a3a55; }
+[data-theme="dark"] .page-link { background-color: var(--card-bg); border-color: #2a2a4a; color: var(--text); }
+[data-theme="dark"] .page-item.active .page-link { background-color: #6200EE; border-color: #6200EE; }
+
+/* ===== Scroll to top ===== */
+#scrollTopBtn {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: #6200EE; color: white;
+    border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    display: none; align-items: center; justify-content: center;
+    font-size: 1.3rem; cursor: pointer; z-index: 1050;
+    transition: opacity 0.3s, transform 0.3s;
+}
+#scrollTopBtn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+
+/* ===== Page transitions ===== */
+main[role="main"] {
+    animation: pageIn 0.2s ease-out;
+}
+@keyframes pageIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}

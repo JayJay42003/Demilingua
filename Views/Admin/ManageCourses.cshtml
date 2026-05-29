@@ -1,0 +1,89 @@
+@model List<Demilingua.Models.Curso>
+@{
+    ViewData["Title"] = "Gestionar Cursos";
+    var idiomas = ViewBag.Idiomas as List<Demilingua.Models.Idioma> ?? new List<Demilingua.Models.Idioma>();
+}
+
+<div class="container mt-4">
+    <h2><i class="bi bi-book me-2"></i>Gestionar Cursos</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm mb-3"><i class="bi bi-arrow-left"></i> Volver</a>
+
+    <div class="card shadow-sm mb-4" style="border-radius: 12px;">
+        <div class="card-header bg-white fw-bold">Crear Curso</div>
+        <div class="card-body">
+            <form method="post" asp-action="CreateCurso" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Idioma</label>
+                    <select name="idiomaId" class="form-select" required>
+                        @foreach (var idioma in idiomas)
+                        {
+                            <option value="@idioma.Id">@idioma.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" name="nombre" class="form-control" placeholder="Ej: Ingles Basico" required />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Dificultad</label>
+                    <select name="dificultad" class="form-select">
+                        <option value="Facil">Facil</option>
+                        <option value="Media">Media</option>
+                        <option value="Dificil">Dificil</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Descripcion</label>
+                    <input type="text" name="descripcion" class="form-control" placeholder="Descripcion breve..." required />
+                </div>
+                <div class="col-md-2 mt-3">
+                    <button type="submit" class="btn btn-primary w-100">Crear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Idioma</th>
+                    <th>Nombre</th>
+                    <th>Dificultad</th>
+                    <th>Descripcion</th>
+                    <th>Accion</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="6" class="text-center py-4 text-muted">
+                        <i class="bi bi-bookmark-plus display-4 d-block mb-2"></i>
+                        Ningun curso creado. Usa el formulario superior para crear el primero.
+                    </td></tr>
+                }
+                @foreach (var curso in Model)
+                {
+                    var idioma = idiomas.FirstOrDefault(i => i.Id == curso.IdiomaId);
+                    var iname = idioma?.Name ?? "Idioma #" + curso.IdiomaId;
+                    <tr>
+                        <td>@curso.Id</td>
+                        <td>@iname</td>
+                        <td>@curso.Nombre</td>
+                        <td><span class="badge bg-secondary">@curso.Dificultad</span></td>
+                        <td><small>@curso.Descripcion</small></td>
+                        <td>
+                            <form method="post" asp-action="DeleteCurso" class="d-inline"
+                                  onsubmit="return confirm('Eliminar curso @curso.Nombre?')">
+                                <input type="hidden" name="id" value="@curso.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,89 @@
+@model List<Dictionary<string, object>>
+@{
+    ViewData["Title"] = "Gestionar Tests";
+    var cursos = ViewBag.Cursos as List<Demilingua.Models.Curso> ?? new List<Demilingua.Models.Curso>();
+    int cursoIdActual = (int)(ViewBag.CursoId ?? 1);
+}
+
+<div class="container mt-4">
+    <h2>Gestionar Tests</h2>
+    <a asp-action="Index" class="btn btn-outline-secondary btn-sm mb-3"><i class="bi bi-arrow-left"></i> Volver</a>
+
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="card shadow-sm mb-3" style="border-radius: 12px;">
+                <div class="card-header bg-white fw-bold">Crear Nuevo Test</div>
+                <div class="card-body">
+                    <form asp-action="CreateTest" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Curso</label>
+                            <select name="cursoId" class="form-select" required>
+                                @foreach (var c in cursos)
+                                {
+                                    <option value="@c.Id" selected="@(c.Id == cursoIdActual ? "selected" : null)">@c.Nombre (@c.Dificultad)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Titulo del Test</label>
+                            <input type="text" name="titulo" class="form-control" placeholder="Ej: Saludos y Despedidas" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Crear Test</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            @if (Model != null && Model.Count > 0)
+            {
+                <div class="card shadow-sm" style="border-radius: 12px;">
+                    <div class="card-header bg-white fw-bold">
+                        Tests del curso seleccionado (@Model.Count)
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr><th>ID</th><th>Titulo</th><th>Accion</th></tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var test in Model)
+                                {
+                                    <tr>
+                                        <td>@test["id"]</td>
+                                        <td>@test["titulo"]</td>
+                                        <td>
+                                            <form asp-action="DeleteTest" method="post" class="d-inline"
+                                                  onsubmit="return confirm('Eliminar test @test["titulo"]?')">
+                                                <input type="hidden" name="testId" value="@test["id"]" />
+                                                <input type="hidden" name="cursoId" value="@cursoIdActual" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card shadow-sm" style="border-radius: 12px;">
+                    <div class="card-body text-center py-5 text-muted">
+                        <i class="bi bi-journal-plus display-3 mb-2 d-block"></i>
+                        <h5>Ningun test creado aun</h5>
+                        <p>Usa el formulario de la izquierda para crear el primer test de este curso.</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.querySelector('select[name="cursoId"]').addEventListener('change', function() {
+        window.location.href = '/Admin/ManageTests?cursoId=' + this.value;
+    });
+</script>
+}
